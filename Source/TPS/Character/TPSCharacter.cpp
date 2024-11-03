@@ -49,7 +49,7 @@ ATPSCharacter::ATPSCharacter()
 	static ConstructorHelpers::FObjectFinder<UMaterial> DecalMaterialAsset(TEXT("Material'/Game/Blueprint/Character/M_Cursor_Decal.M_Cursor_Decal'"));
 	if (DecalMaterialAsset.Succeeded())
 	{
-	
+
 		CursorToWorld->SetDecalMaterial(DecalMaterialAsset.Object);
 	}
 	CursorToWorld->DecalSize = FVector(16.0f, 32.0f, 32.0f);
@@ -58,7 +58,13 @@ ATPSCharacter::ATPSCharacter()
 	// Activate ticking in order to update the cursor every frame.
 	PrimaryActorTick.bCanEverTick = true;
 	PrimaryActorTick.bStartWithTickEnabled = true;
+
+	
+	// Включите использованиеTick, если нужно, чтобы обновлять логическую часть
+	PrimaryActorTick.bCanEverTick = true;
+	
 }
+
 
 void ATPSCharacter::Tick(float DeltaSeconds)
 {
@@ -91,6 +97,7 @@ void ATPSCharacter::Tick(float DeltaSeconds)
 		}
 	}
 	MovementTick(DeltaSeconds);
+
 }
 
 void ATPSCharacter::SetupPlayerInputComponent(UInputComponent* NewInputComponent)
@@ -102,6 +109,19 @@ void ATPSCharacter::SetupPlayerInputComponent(UInputComponent* NewInputComponent
 	NewInputComponent->BindAxis(TEXT("MoveRight"), this, & ATPSCharacter::InputAxisY);
 
 }
+
+void ATPSCharacter::MoveForward(float Value)
+{
+	if (Controller != nullptr && Value != 0.0f)
+	{
+		// Получение вектора вперед персонажа
+		const FRotator Rotation = Controller->GetControlRotation();
+		const FRotator YawRotation(0, Rotation.Yaw, 0);
+		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X); // Ось X - вперед
+		AddMovementInput(Direction, Value);
+	}
+}
+
 
 void ATPSCharacter::InputAxisY(float Value)
 {
@@ -198,4 +218,5 @@ void ATPSCharacter::ChangeMovementState()
 	CharacterUpdate();
 
 }
+
 

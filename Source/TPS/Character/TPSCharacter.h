@@ -1,17 +1,16 @@
 // Copyright 1998-2019 Epic Games, Inc. All Rights Reserved.
 
 #pragma once
-
-#include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "FuncLibrary/Types.h"
+#include "CoreMinimal.h"
 #include "TPSCharacter.generated.h"
 
 UCLASS(Blueprintable)
 class ATPSCharacter : public ACharacter
 {
 	GENERATED_BODY()
-
+	
 public:
 	ATPSCharacter();
 
@@ -67,8 +66,11 @@ public:
 	UFUNCTION(BlueprintCallable)
 		void CharacterUpdate();
 	UFUNCTION(BlueprintCallable)
-		void ChangeMovementState();
+		void ChangeMovementState(); 
+	UFUNCTION(BlueprintCallable)
+		void MoveForward(float Value);
 
 
 };
+
 
