@@ -97,7 +97,18 @@ void ATPSCharacter::Tick(float DeltaSeconds)
 		}
 	}
 	MovementTick(DeltaSeconds);
+	HandleCharacterMovementSpeedTick();
 
+}
+
+void ATPSCharacter::StartSprinting()
+{
+	MovementState = EMovementState::SprintRun_State;
+}
+
+void ATPSCharacter::StopSprinting()
+{
+	MovementState = EMovementState::Walk_State;
 }
 
 void ATPSCharacter::SetupPlayerInputComponent(UInputComponent* NewInputComponent)
@@ -108,21 +119,32 @@ void ATPSCharacter::SetupPlayerInputComponent(UInputComponent* NewInputComponent
 	NewInputComponent->BindAxis(TEXT("MoveForward"), this, & ATPSCharacter::InputAxisX);
 	NewInputComponent->BindAxis(TEXT("MoveRight"), this, & ATPSCharacter::InputAxisY);
 
+	NewInputComponent->BindAction(TEXT("MovementModeChangeSprint"), IE_Pressed, this, &ATPSCharacter::StartSprinting);
+	NewInputComponent->BindAction(TEXT("MovementModeChangeSprint"), IE_Released, this, &ATPSCharacter::StopSprinting);
+
 }
 
-void ATPSCharacter::MoveForward(float Value)
+void ATPSCharacter::HandleCharacterMovementSpeedTick()
 {
-	if (Controller != nullptr && Value != 0.0f)
+	FVector Velocity = GetVelocity();
+	FVector NormalizedVelocity = Velocity.GetSafeNormal();
+
+	FVector ForwardVector = GetActorForwardVector();
+	float CosineAngle = FVector::DotProduct(NormalizedVelocity, ForwardVector);
+	CosineAngle = FMath::Clamp(CosineAngle, -1.0f, 1.0f);
+	float AngleInRadians = FMath::Acos(CosineAngle);
+	float AngleInDegrees = FMath::RadiansToDegrees(AngleInRadians);
+	const float AngleThreshold = 30.0f;
+
+
+	if (MovementState == EMovementState::SprintRun_State)
 	{
-		// Получение вектора вперед персонажа
-		const FRotator Rotation = Controller->GetControlRotation();
-		const FRotator YawRotation(0, Rotation.Yaw, 0);
-		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X); // Ось X - вперед
-		AddMovementInput(Direction, Value);
+		FVector ForwardVelocity = ForwardVector * Velocity.Size();
+		GetCharacterMovement()->Velocity = ForwardVelocity;
 	}
+
+
 }
-
-
 void ATPSCharacter::InputAxisY(float Value)
 {
 	AxisY = Value;

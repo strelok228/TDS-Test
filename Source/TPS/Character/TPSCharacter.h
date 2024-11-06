@@ -66,10 +66,13 @@ public:
 	UFUNCTION(BlueprintCallable)
 		void CharacterUpdate();
 	UFUNCTION(BlueprintCallable)
-		void ChangeMovementState(); 
+		void ChangeMovementState();
 	UFUNCTION(BlueprintCallable)
-		void MoveForward(float Value);
-
+		void StartSprinting();
+	UFUNCTION(BlueprintCallable)
+		void StopSprinting();
+	UFUNCTION(BlueprintCallable)
+		void HandleCharacterMovementSpeedTick();
 
 };
 
