@@ -24,7 +24,7 @@ public:
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	/** Returns CursorToWorld subobject **/
-	FORCEINLINE class UDecalComponent* GetCursorToWorld() { return CursorToWorld; }
+	//FORCEINLINE class UDecalComponent* GetCursorToWorld() { return CursorToWorld; }
 
 private:
 	/** Top down camera */
@@ -36,10 +36,17 @@ private:
 	class USpringArmComponent* CameraBoom;
 
 	/** A decal that projects to the cursor location. */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-	class UDecalComponent* CursorToWorld;
+	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	//class UDecalComponent* CursorToWorld;
 
 public:
+	//Cursor
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "Cursor")
+		UMaterialInterface* CursorMaterial = nullptr;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Cursor")
+		FVector CursorSize = FVector(20.0f, 40.0f, 40.0f);
+
+	//Movement
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
 		EMovementState MovementState = EMovementState::Run_State;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
@@ -52,6 +59,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
 		bool AimEnabled = false;
 
+	UDecalComponent* CurrentCursor = nullptr;
+
 	UFUNCTION()
 	void InputAxisY(float Value);
 	UFUNCTION()	
@@ -59,9 +68,14 @@ public:
 
 	float AxisX = 0.0f;
 	float AxisY = 0.0f;
+
+	UFUNCTION(BlueprintCallable)
+		void AttackCharEvent(bool bIsFiring);
 	//
 	UFUNCTION()
 	void MovementTick(float DeltaTaim);
+	UFUNCTION()
+		void BeginPlay();
 
 	UFUNCTION(BlueprintCallable)
 		void CharacterUpdate();
@@ -73,6 +87,15 @@ public:
 		void StopSprinting();
 	UFUNCTION(BlueprintCallable)
 		void HandleCharacterMovementSpeedTick();
+	UFUNCTION(BlueprintCallable)
+		void InitWeapon();
+	UFUNCTION(BlueprintCallable)
+		UDecalComponent* GetCursorToWorld();
+
+	UFUNCTION()
+		void InputAttackPressed();
+	UFUNCTION()
+		void InputAttackReleased();
 
 };
 
