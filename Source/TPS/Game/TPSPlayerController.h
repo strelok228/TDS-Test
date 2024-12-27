@@ -13,7 +13,6 @@ class ATPSPlayerController : public APlayerController
 
 public:
 	ATPSPlayerController();
-
 protected:
 	/** True if the controlled character should navigate to the mouse cursor. */
 	uint32 bMoveToMouseCursor : 1;
@@ -39,3 +38,5 @@ protected:
 	void OnSetDestinationPressed();
 	void OnSetDestinationReleased();
 };
+
+
