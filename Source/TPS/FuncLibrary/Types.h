@@ -6,7 +6,7 @@
 #include "Engine/DataTable.h"
 
 #include "TPS/FuncLibrary/Types.h"
-
+#include "Types.generated.h"
 
 
 enum class EMovementState : uint8

@@ -11,7 +11,7 @@
 #include "FuncLibrary/Types.h"
 #include "Weapons/Projectiles/ProjectileDefault_Grenade.h" 
 
-#include "TPS/Weapons/Projectiles/ProjectileDefault.h"
+#include "ProjectileDefault.generated.h"
 
 UCLASS()
 class TPS_API AProjectileDefault : public AActor
