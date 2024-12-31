@@ -7,7 +7,8 @@
 #include "FuncLibrary/Types.h"
 #include "Engine/DataTable.h"
 #include "Weapons/WeaponDefault.h"
-#include "GameInstance.generated.h"
+
+#include "TPSGameInstance.generated.h"
 
 /**
  * 

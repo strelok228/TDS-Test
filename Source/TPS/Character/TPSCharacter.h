@@ -8,7 +8,7 @@
 #include "Weapons/WeaponDefault.h"
 //#include "Components/WidgetComponent.h"
 
-#include "Character.generated.h"
+#include "TPSCharacter.generated.h"
 
 //USTRUCT(BlueprintType)
 //struct FCharacterSpeedInfo

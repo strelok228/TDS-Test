@@ -4,8 +4,8 @@
 
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "Engine/DataTable.h"
-
 #include "TPS/FuncLibrary/Types.h"
+
 #include "Types.generated.h"
 
 
