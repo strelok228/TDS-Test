@@ -4,7 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
-#include "ATPSGameMode.generated.h"
+
+#include "TPSGameMode.generated.h"
 
 UCLASS(minimalapi)
 class ATPSGameMode : public AGameModeBase
