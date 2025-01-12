@@ -5,8 +5,7 @@
 #include "CoreMinimal.h"
 #include "Weapons/Projectiles/ProjectileDefault.h"
 
-#include "TPS/Weapons/Projectiles/ProjectileDefault_Grenade.h"
-#include "ProjectileDefault_Grenade.generated.h"
+#include "TPS/ProjectileDefault_Grenade.generated.h"
 
 /**
  * 

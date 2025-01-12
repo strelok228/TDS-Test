@@ -13,8 +13,8 @@ void AProjectileDefault_Grenade::BeginPlay()
 void AProjectileDefault_Grenade::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	
 	TimerExplose(DeltaTime);
+
 
 }
 

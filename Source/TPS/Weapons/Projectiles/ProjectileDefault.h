@@ -9,9 +9,10 @@
 #include "GameFramework/ProjectileMovementComponent.h"
 
 #include "FuncLibrary/Types.h"
-#include "Weapons/Projectiles/ProjectileDefault_Grenade.h" 
+#include "ProjectileDefault_Grenade.h" 
+#include "ProjectileDefault.h"
 
-#include "TPSProjectileDefault.generated.h"
+#include "ProjectileDefault_Grenade.generated.h" 
 
 UCLASS()
 class TPS_API AProjectileDefault : public AActor
