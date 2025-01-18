@@ -9,6 +9,8 @@ public class TPS : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
+        PublicIncludePaths.AddRange(new string[] { "TPS" });
+
         PublicIncludePaths.Add(Path.Combine(ModuleDirectory, "TPS"));
         PrivateIncludePaths.Add(Path.Combine(ModuleDirectory, "TPS"));
 
