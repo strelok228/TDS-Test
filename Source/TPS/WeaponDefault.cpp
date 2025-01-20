@@ -38,15 +38,17 @@ void AWeaponDefault::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	FireTick(DeltaTime);
+
 }
 
 void AWeaponDefault::FireTick(float DeltaTime)
 {
 	if (WeaponFiring)
-			if (FireTimer < 0.f)
-				Fire();
-			else
-				FireTimer -= DeltaTime;
+		if (FireTimer < 0.f)
+			Fire();
+		else
+			FireTimer -= DeltaTime;
 
 }
 

@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Engine/GameInstance.h"
 #include "Engine/DataTable.h"
+#include "FuncLibrary/Types.h"
 #include "WeaponDefault.h"
 #include "TPSGameInstance.generated.h"
 

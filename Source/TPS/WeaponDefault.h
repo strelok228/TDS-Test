@@ -38,12 +38,13 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ReloadLogic")
 		bool WeaponReloading = false;
 
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 public:	
-	// Called every frame
+	// Called every frame 
 	virtual void Tick(float DeltaTime) override;
 	
 	
