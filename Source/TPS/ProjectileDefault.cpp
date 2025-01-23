@@ -13,6 +13,10 @@ AProjectileDefault::AProjectileDefault()
 
 	BulletCollisionSphere->SetSphereRadius(16.f);
 
+	BulletCollisionSphere->OnComponentHit.AddDynamic(this, &AProjectileDefault::BulletCollisionSphereHit);
+	BulletCollisionSphere->OnComponentBeginOverlap.AddDynamic(this, &AProjectileDefault::BulletCollisionSphereBeginOverlap);
+	BulletCollisionSphere->OnComponentEndOverlap.AddDynamic(this, &AProjectileDefault::BulletCollisionSphereEndOverlap);
+
 	BulletCollisionSphere->bReturnMaterialOnMove = true;//hit event return physMaterial
 
 	BulletCollisionSphere->SetCanEverAffectNavigation(false);//collision not affect navigation (P keybord on editor)
@@ -42,10 +46,6 @@ AProjectileDefault::AProjectileDefault()
 void AProjectileDefault::BeginPlay()
 {
 	Super::BeginPlay();
-
-	BulletCollisionSphere->OnComponentHit.AddDynamic(this, &AProjectileDefault::BulletCollisionSphereHit);
-	BulletCollisionSphere->OnComponentBeginOverlap.AddDynamic(this, &AProjectileDefault::BulletCollisionSphereBeginOverlap);
-	BulletCollisionSphere->OnComponentEndOverlap.AddDynamic(this, &AProjectileDefault::BulletCollisionSphereEndOverlap);
 	
 }
 
