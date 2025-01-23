@@ -132,7 +132,7 @@ void ATPSCharacter::StopSprinting()
 	MovementState = EMovementState::Walk_State;
 }
 
-void ATPSCharacter::SetupPlayerInputComponent(UInputComponent* NewInputComponent)
+void ATPSCharacter::SetupPlayerInputComponent(UInputComponent* NewInputComponent) 
 {
 
 	Super::SetupPlayerInputComponent(NewInputComponent);
@@ -140,11 +140,13 @@ void ATPSCharacter::SetupPlayerInputComponent(UInputComponent* NewInputComponent
 	NewInputComponent->BindAxis(TEXT("MoveForward"), this, & ATPSCharacter::InputAxisX);
 	NewInputComponent->BindAxis(TEXT("MoveRight"), this, & ATPSCharacter::InputAxisY);
 
+
 	NewInputComponent->BindAction(TEXT("MovementModeChangeSprint"), IE_Pressed, this, &ATPSCharacter::StartSprinting);
 	NewInputComponent->BindAction(TEXT("MovementModeChangeSprint"), IE_Released, this, &ATPSCharacter::StopSprinting);
 
 	NewInputComponent->BindAction(TEXT("FireEvent"), EInputEvent::IE_Pressed, this, &ATPSCharacter::InputAttackPressed);
 	NewInputComponent->BindAction(TEXT("FireEvent"), EInputEvent::IE_Released, this, &ATPSCharacter::InputAttackReleased);
+
 
 }
 
@@ -243,6 +245,7 @@ void ATPSCharacter::InputAxisX(float Value)
 {
 	AxisX = Value;
 }
+
 
 void ATPSCharacter::InputAttackPressed()
 {

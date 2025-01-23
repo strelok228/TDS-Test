@@ -44,12 +44,24 @@ void AWeaponDefault::Tick(float DeltaTime)
 
 void AWeaponDefault::FireTick(float DeltaTime)
 {
-	if (WeaponFiring)
-		if (FireTimer < 0.f)
-			Fire();
-		else
-			FireTimer -= DeltaTime;
-
+	if (GetWeaponRound() > 0)
+	{
+		if (WeaponFiring)
+			if (FireTimer < 0.f)
+			{
+				if (!WeaponReloading)
+					Fire();
+			}
+			else
+				FireTimer -= DeltaTime;
+	}
+	else
+	{
+		if (!WeaponReloading)
+		{
+			InitReload();
+		}
+	}
 }
 
 void AWeaponDefault::WeaponInit()
@@ -124,4 +136,13 @@ void AWeaponDefault::Fire()
 			}
 			
 	}
+}
+
+int32 AWeaponDefault::GetWeaponRound()
+{
+	return WeaponInfo.Round;
+}
+
+void AWeaponDefault::InitReload()
+{
 }

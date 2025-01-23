@@ -1,1 +1,38 @@
-﻿
+﻿1>------ Перестроение всех файлов начато: проект: TPS, Конфигурация: Development x64 ------
+1>Cleaning TPS and UnrealHeaderTool binaries...
+1>Using 'git status' to determine working set for adaptive non-unity build (C:\Users\strel\Documents\Unreal Projects\TPS).
+1>Creating makefile for TPS (no existing makefile)
+1>C:\Users\strel\Documents\Unreal Projects\TPS\Source\TPS\TPS.Build.cs : warning : Referenced directory 'C:\Users\strel\Documents\Unreal Projects\TPS\Source\TPS\TPS' does not exist.
+1>Parsing headers for TPS
+1>  Running UnrealHeaderTool "C:\Users\strel\Documents\Unreal Projects\TPS\TPS.uproject" "C:\Users\strel\Documents\Unreal Projects\TPS\Intermediate\Build\Win64\TPS\Development\TPS.uhtmanifest" -LogCmds="loginit warning, logexit warning, logdatabase error" -Unattended -WarningsAsErrors -installed
+1>Reflection code generated for TPS in 4,2182904 seconds
+1>Using Visual Studio 2019 14.42.34433 toolchain (C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433) and Windows 10.0.22621.0 SDK (C:\Program Files (x86)\Windows Kits\10).
+1>Building 22 actions with 16 processes...
+1>  [1/22] Default.rc2
+1>  [2/22] SharedPCH.Engine.cpp
+1>  Detected compiler newer than Visual Studio 2019, please update min version checking in WindowsPlatformCompilerSetup.h
+1>  [3/22] TPS.cpp
+1>  [4/22] TPS.init.gen.cpp
+1>  [5/22] TPSPlayerController.gen.cpp
+1>  [6/22] Types.cpp
+1>  [7/22] TPSGameMode.gen.cpp
+1>  [8/22] WorldItemDefault.gen.cpp
+1>  [9/22] ProjectileDefault.cpp
+1>  [10/22] TPSGameInstance.cpp
+1>  [11/22] TPSGameInstance.gen.cpp
+1>  [12/22] WorldItemDefault.cpp
+1>  [13/22] TPSPlayerController.cpp
+1>  [14/22] WeaponDefault.cpp
+1>  [15/22] WeaponDefault.gen.cpp
+1>  [16/22] Types.gen.cpp
+1>  [17/22] TPSCharacter.gen.cpp
+1>  [18/22] TPSGameMode.cpp
+1>  [19/22] ProjectileDefault.gen.cpp
+1>  [20/22] TPSCharacter.cpp
+1>  [21/22] TPS.exe
+1>     Создается библиотека C:\Users\strel\Documents\Unreal Projects\TPS\Binaries\Win64\TPS.lib и объект C:\Users\strel\Documents\Unreal Projects\TPS\Binaries\Win64\TPS.exp
+1>  [22/22] TPS.target
+1>Total time in Parallel executor: 15,82 seconds
+1>Total execution time: 24,62 seconds
+1>Сборка проекта "TPS.vcxproj" завершена.
+========== Перестроение всех проектов: успешно: 1, с ошибками: 0, пропущено: 0 ==========

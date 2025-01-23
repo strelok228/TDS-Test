@@ -164,6 +164,7 @@ struct FWeaponInfo : public FTableRowBase
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mesh ")
 		UStaticMesh* ShellBullets = nullptr;
 
+
 };
 
 UCLASS()

@@ -27,6 +27,7 @@ public:
 		class UStaticMeshComponent* StaticMeshWeapon = nullptr;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"), Category = Components)
 		class UArrowComponent* ShootLocation = nullptr;
+
 	UPROPERTY()
 		FWeaponInfo WeaponSetting;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon Info")
@@ -57,8 +58,17 @@ public:
 
 	bool CheckWeaponCanFire();
 
-	float FireTimer = 0.0f;
 	FProjectileInfo GetProjectile();
 
 	void Fire();
+
+	UFUNCTION(BlueprintCallable)
+		int32 GetWeaponRound();
+	void InitReload();
+	//Timers
+	float FireTimer = 0.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ReloadLogic")
+		float ReloadTimer = 0.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ReloadLogic Debug")	//Remove !!! Debug
+		float ReloadTime = 0.0f;
 };
