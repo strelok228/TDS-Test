@@ -127,43 +127,46 @@ struct FWeaponInfo : public FTableRowBase
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Class")
-		TSubclassOf<class AWeaponDefault> WeaponClass = nullptr;
+	TSubclassOf<class AWeaponDefault> WeaponClass = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "State")
-		float RateOfFire = 0.5f;
+	float RateOfFire = 0.5f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "State")
-		float ReloadTime = 2.0f;
+	float ReloadTime = 2.0f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "State")
-		int32 MaxRound = 10;
+	int32 MaxRound = 10;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "State")
-		int32 NumberProjectileByShot = 1;
+	int32 NumberProjectileByShot = 1;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dispersion ")
-		FWeaponDispersion DispersionWeapon;
+	FWeaponDispersion DispersionWeapon;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound ")
-		USoundBase* SoundFireWeapon = nullptr;
+	USoundBase* SoundFireWeapon = nullptr;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound ")
-		USoundBase* SoundReloadWeapon = nullptr;
+	USoundBase* SoundReloadWeapon = nullptr;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FX ")
-		UParticleSystem* EffectFireWeapon = nullptr;
+	UParticleSystem* EffectFireWeapon = nullptr;
 	//if null use trace logic (TSubclassOf<class AProjectileDefault> Projectile = nullptr)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projectile ")
-		FProjectileInfo ProjectileSetting;
+	FProjectileInfo ProjectileSetting;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Trace ")
-		float WeaponDamage = 20.0f;
+	float WeaponDamage = 20.0f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Trace ")
-		float DistacneTrace = 2000.0f;
+	float DistacneTrace = 2000.0f;
 	//one decal on all?
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HitEffect ")
-		UDecalComponent* DecalOnHit = nullptr;
+	UDecalComponent* DecalOnHit = nullptr;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Anim ")
+	UAnimMontage* AnimCharFire = nullptr;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Anim ")
+	UAnimMontage* AnimCharReload = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mesh ")
-		UStaticMesh* MagazineDrop = nullptr;
+	UStaticMesh* MagazineDrop = nullptr;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mesh ")
-		UStaticMesh* ShellBullets = nullptr;
-
+	UStaticMesh* ShellBullets = nullptr;
 
 };
 

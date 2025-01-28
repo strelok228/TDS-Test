@@ -10,6 +10,9 @@
 #include "ProjectileDefault.h"
 #include "WeaponDefault.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnWeaponReloadStart, UAnimMontage*, Anim);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnWeaponReloadEnd);
+
 UCLASS()
 class TPS_API AWeaponDefault : public AActor
 {
@@ -18,6 +21,9 @@ class TPS_API AWeaponDefault : public AActor
 public:	
 	// Sets default values for this actor's properties 
 	AWeaponDefault();
+
+	FOnWeaponReloadEnd OnWeaponReloadEnd;
+	FOnWeaponReloadStart OnWeaponReloadStart;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"), Category = Components)
 		class USceneComponent* SceneComponent = nullptr;
@@ -50,8 +56,11 @@ public:
 	
 	
 	void FireTick(float DeltaTime);
+	void ReloadTick(float DeltaTime);
+	void DispersionTick(float DeltaTime);
 	void WeaponInit();
 	void UpdateStateWeapon(EMovementState NewMovementState);
+	void FinishReload();
 
 	UFUNCTION(BlueprintCallable)
 	void SetWeaponStateFire(bool bIsFire);
@@ -65,6 +74,37 @@ public:
 	UFUNCTION(BlueprintCallable)
 		int32 GetWeaponRound();
 	void InitReload();
+
+	void ChangeDispersionByShot();
+	float GetCurrentDispersion() const;
+	FVector GetFireEndLocation()const;
+
+
+	//flags
+	bool BlockFire = false;
+
+
+
+	int8 GetNumberProjectileByShot() const;
+
+	FVector ShootEndLocation = FVector(0);
+	FVector ApplyDispersionToShoot(FVector DirectionShoot)const;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Debug")
+	bool ShowDebug = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Debug")
+	float SizeVectorToChangeShootDirectionLogic = 100.0f;
+
+	//Dispersion
+	bool ShouldReduceDispersion = false;
+	float CurrentDispersion = 0.0f;
+	float CurrentDispersionMax = 1.0f;
+	float CurrentDispersionMin = 0.1f;
+	float CurrentDispersionRecoil = 0.1f;
+	float CurrentDispersionReduction = 0.1f;
+
+
 	//Timers
 	float FireTimer = 0.0f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ReloadLogic")

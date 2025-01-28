@@ -68,6 +68,9 @@ public:
 		void InputAttackPressed();
 	UFUNCTION()
 		void InputAttackReleased();
+	UFUNCTION(BlueprintCallable)
+		void TryReloadWeapon();
+
 	//for demo 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Demo")
 		FName InitWeaponName;
@@ -109,6 +112,15 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 		AWeaponDefault* GetCurrentWeapon();
+
+		UFUNCTION()
+		void WeaponReloadStart(UAnimMontage* Anim);
+		UFUNCTION()
+		void WeaponReloadEnd();
+		UFUNCTION(BlueprintNativeEvent)
+		void WeaponReloadStart_BP(UAnimMontage* Anim);
+		UFUNCTION(BlueprintNativeEvent)
+		void WeaponReloadEnd_BP();
 
 
 
