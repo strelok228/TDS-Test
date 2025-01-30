@@ -273,7 +273,7 @@ void AWeaponDefault::InitReload()
 	if (WeaponSetting.AnimCharReload)
 		OnWeaponReloadStart.Broadcast(WeaponSetting.AnimCharReload);
 }
-
+		
 void AWeaponDefault::ChangeDispersionByShot()
 {
 	CurrentDispersion = CurrentDispersion + CurrentDispersionRecoil;
@@ -331,5 +331,5 @@ int8 AWeaponDefault::GetNumberProjectileByShot() const
 
 FVector AWeaponDefault::ApplyDispersionToShoot(FVector DirectionShoot) const
 {
-	return FVector();
+	return FMath::VRandCone(DirectionShoot, GetCurrentDispersion() * PI / 180.f);
 }

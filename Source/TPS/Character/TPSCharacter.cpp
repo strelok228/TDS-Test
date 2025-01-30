@@ -236,12 +236,12 @@ void ATPSCharacter::WeaponReloadEnd()
 	WeaponReloadEnd_BP();
 }
 
-void ATPSCharacter::WeaponReloadStart_BP(UAnimMontage* Anim)
+void ATPSCharacter::WeaponReloadStart_BP_Implementation(UAnimMontage* Anim)
 {
 	// in BP
 }
 
-void ATPSCharacter::WeaponReloadEnd_BP()
+void ATPSCharacter::WeaponReloadEnd_BP_Implementation()
 {
 
 	// in BP
