@@ -204,6 +204,7 @@ void ATPSCharacter::InitWeapon(FName IdWeaponName)
 					myWeapon->WeaponSetting = myWeaponInfo;
 					myWeapon->WeaponInfo.Round = myWeaponInfo.MaxRound;
 					//Remove !!! Debug
+					myWeapon->ReloadTime = myWeaponInfo.ReloadTime;
 					myWeapon->UpdateStateWeapon(MovementState);
 
 

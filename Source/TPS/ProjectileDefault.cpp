@@ -8,7 +8,7 @@
 // Sets default values
 AProjectileDefault::AProjectileDefault()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	BulletCollisionSphere = CreateDefaultSubobject<USphereComponent>(TEXT("Collision Sphere"));
@@ -45,9 +45,9 @@ void AProjectileDefault::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	BulletCollisionSphere->OnComponentHit.AddDynamic(this, &AProjectileDefault::BulletCollisionSphereHit);
-	BulletCollisionSphere->OnComponentBeginOverlap.AddDynamic(this, &AProjectileDefault::BulletCollisionSphereBeginOverlap);
-	BulletCollisionSphere->OnComponentEndOverlap.AddDynamic(this, &AProjectileDefault::BulletCollisionSphereEndOverlap);
+	BulletCollisionSphere->OnComponentHit.AddUniqueDynamic(this, &AProjectileDefault::BulletCollisionSphereHit);
+	BulletCollisionSphere->OnComponentBeginOverlap.AddUniqueDynamic(this, &AProjectileDefault::BulletCollisionSphereBeginOverlap);
+	BulletCollisionSphere->OnComponentEndOverlap.AddUniqueDynamic(this, &AProjectileDefault::BulletCollisionSphereEndOverlap);
 
 }
 
@@ -101,7 +101,12 @@ void AProjectileDefault::BulletCollisionSphereHit(UPrimitiveComponent * HitComp,
 
 	}
 	UGameplayStatics::ApplyDamage(OtherActor, ProjectileSetting.ProjectileDamage, GetInstigatorController(), this, NULL);
-	//ImpactProjectile();
+	ImpactProjectile();
+	//UGameplayStatics::ApplyRadialDamageWithFalloff()
+	//Apply damage cast to if char like bp? //OnAnyTakeDmage delegate
+	//UGameplayStatics::ApplyDamage(OtherActor, ProjectileSetting.ProjectileDamage, GetOwner()->GetInstigatorController(), GetOwner(), NULL);
+	//or custom damage by health component
+
 }
 
 void AProjectileDefault::BulletCollisionSphereBeginOverlap(UPrimitiveComponent * OverlappedComponent, AActor * OtherActor, UPrimitiveComponent * OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult)
@@ -112,8 +117,8 @@ void AProjectileDefault::BulletCollisionSphereEndOverlap(UPrimitiveComponent * O
 {
 }
 
-//void AProjectileDefault::ImpactProjectile()
-//{
-	//this->Destroy();
-//}
+void AProjectileDefault::ImpactProjectile()
+{
+	this->Destroy();
+}
 
