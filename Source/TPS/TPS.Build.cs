@@ -14,6 +14,6 @@ public class TPS : ModuleRules
         PublicIncludePaths.Add(Path.Combine(ModuleDirectory, "TPS"));
         PrivateIncludePaths.Add(Path.Combine(ModuleDirectory, "TPS"));
 
-        PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "HeadMountedDisplay", "NavigationSystem", "AIModule" });
+        PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "PhysicsCore", "HeadMountedDisplay", "NavigationSystem", "AIModule" });
     }
 }
