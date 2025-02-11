@@ -3,6 +3,7 @@
 
 #include "ProjectileDefault_Grenade.h"
 #include "Kismet/GameplayStatics.h"
+#include "DrawDebugHelpers.h"
 
 // Called when the game starts or when spawned
 void AProjectileDefault_Grenade::BeginPlay()
@@ -48,19 +49,19 @@ void AProjectileDefault_Grenade::ImpactProjectile()
 void AProjectileDefault_Grenade::Explose()
 {
 	TimerEnabled = false;
-	if (ProjectileSetting.ExploseFX)
+	if (ProjectileSetting.ExplodeFX)
 	{
-		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ProjectileSetting.ExploseFX, GetActorLocation(), GetActorRotation(), FVector(1.0f));
+		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ProjectileSetting.ExplodeFX, GetActorLocation(), GetActorRotation(), FVector(1.0f));
 	}
-	if (ProjectileSetting.ExploseSound)
+	if (ProjectileSetting.ExplodeSound)
 	{
-		UGameplayStatics::PlaySoundAtLocation(GetWorld(), ProjectileSetting.ExploseSound, GetActorLocation());
+		UGameplayStatics::PlaySoundAtLocation(GetWorld(), ProjectileSetting.ExplodeSound, GetActorLocation());
 	}
 
 	TArray<AActor*> IgnoredActor;
 	UGameplayStatics::ApplyRadialDamageWithFalloff(GetWorld(),
-		ProjectileSetting.ExploseMaxDamage,
-		ProjectileSetting.ExploseMaxDamage * 0.2f,
+		ProjectileSetting.ExplodeMaxDamage,
+		ProjectileSetting.ExplodeMaxDamage * 0.2f,
 		GetActorLocation(),
 		1000.0f,
 		2000.0f,

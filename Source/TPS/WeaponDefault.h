@@ -44,6 +44,7 @@ public:
 		bool WeaponFiring = false;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ReloadLogic")
 		bool WeaponReloading = false;
+		bool WeaponAiming = false;
 
 
 protected:
@@ -60,7 +61,7 @@ public:
 	void DispersionTick(float DeltaTime);
 	void WeaponInit();
 	void UpdateStateWeapon(EMovementState NewMovementState);
-	void FinishReload();
+	void ShellDropTick(float DeltaTime);
 
 	UFUNCTION(BlueprintCallable)
 	void SetWeaponStateFire(bool bIsFire);
@@ -73,7 +74,9 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 		int32 GetWeaponRound();
+	UFUNCTION()
 	void InitReload();
+	void FinishReload();
 
 	void ChangeDispersionByShot();
 	float GetCurrentDispersion() const;
@@ -83,7 +86,16 @@ public:
 	//flags
 	bool BlockFire = false;
 
+	//Timer Drop Magazine on reload
+	bool DropClipFlag = false;
+	float DropClipTimer = -1.0;
 
+	//shell flag
+	bool DropShellFlag = false;
+	float DropShellTimer = -1.0f;
+
+	UFUNCTION()
+	void InitDropMesh(UStaticMesh* DropMesh, FTransform Offset, FVector DropImpulseDirection, float LifeTimeMesh, float ImpulseRandomDispersion, float PowerImpulse, float CustomMass);
 
 	int8 GetNumberProjectileByShot() const;
 
