@@ -135,63 +135,6 @@ struct FWeaponDispersion
 };
 
 USTRUCT(BlueprintType)
-struct FWeaponInfo : public FTableRowBase
-{
-	GENERATED_BODY()
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Class")
-	TSubclassOf<class AWeaponDefault> WeaponClass = nullptr;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "State")
-	float RateOfFire = 0.5f;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "State")
-	float ReloadTime = 2.0f;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "State")
-	int32 MaxRound = 10;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "State")
-	int32 NumberProjectileByShot = 1;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dispersion ")
-	FWeaponDispersion DispersionWeapon;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound ")
-	USoundBase* SoundFireWeapon = nullptr;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound ")
-	USoundBase* SoundReloadWeapon = nullptr;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FX ")
-	UParticleSystem* EffectFireWeapon = nullptr;
-	//if null use trace logic (TSubclassOf<class AProjectileDefault> Projectile = nullptr)
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projectile ")
-	FProjectileInfo ProjectileSetting;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Trace ")
-	float WeaponDamage = 20.0f;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Trace ")
-	float DistacneTrace = 2000.0f;
-	//one decal on all?
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HitEffect ")
-	UDecalComponent* DecalOnHit = nullptr;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Anim ")
-	UAnimMontage* AnimCharFire = nullptr;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Anim ")
-	UAnimMontage* AnimCharReload = nullptr;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mesh ")
-	UStaticMesh* MagazineDrop = nullptr;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mesh ")
-	UStaticMesh* ShellBullets = nullptr;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Anim ")
-	FAnimationWeaponInfo AnimWeaponInfo;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mesh ")
-	FDropMeshInfo ClipDropMesh;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mesh ")
-	FDropMeshInfo ShellBullets;
-
-
-};
-USTRUCT(BlueprintType)
 struct FAnimationWeaponInfo
 {
 	GENERATED_BODY()
@@ -236,6 +179,55 @@ struct FDropMeshInfo
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "DropMesh ")
 	float CustomMass = 0.0f;
 };
+
+USTRUCT(BlueprintType)
+struct FWeaponInfo : public FTableRowBase
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Class")
+	TSubclassOf<class AWeaponDefault> WeaponClass = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "State")
+	float RateOfFire = 0.5f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "State")
+	float ReloadTime = 2.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "State")
+	int32 MaxRound = 10;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "State")
+	int32 NumberProjectileByShot = 1;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dispersion ")
+	FWeaponDispersion DispersionWeapon;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound ")
+	USoundBase* SoundFireWeapon = nullptr;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound ")
+	USoundBase* SoundReloadWeapon = nullptr;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FX ")
+	UParticleSystem* EffectFireWeapon = nullptr;
+	//if null use trace logic (TSubclassOf<class AProjectileDefault> Projectile = nullptr)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projectile ")
+	FProjectileInfo ProjectileSetting;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Trace ")
+	float WeaponDamage = 20.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Trace ")
+	float DistacneTrace = 2000.0f;
+	//one decal on all?
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HitEffect ")
+	UDecalComponent* DecalOnHit = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Anim ")
+	FAnimationWeaponInfo AnimWeaponInfo;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mesh ")
+	FDropMeshInfo ClipDropMesh;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mesh ")
+	FDropMeshInfo ShellBullets;
+
+
+};
+
 
 UCLASS()
 class TPS_API UTupes : public UBlueprintFunctionLibrary
