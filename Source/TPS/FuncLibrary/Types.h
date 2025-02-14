@@ -218,7 +218,7 @@ struct FWeaponInfo : public FTableRowBase
 	UDecalComponent* DecalOnHit = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Anim ")
-	FAnimationWeaponInfo AnimWeaponInfo;
+	FAnimationWeaponInfo  AdditionalWeaponInfo;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mesh ")
 	FDropMeshInfo ClipDropMesh;
@@ -226,6 +226,15 @@ struct FWeaponInfo : public FTableRowBase
 	FDropMeshInfo ShellBullets;
 
 
+};
+
+USTRUCT(BlueprintType)
+struct FAdditionalWeaponInfo
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon Stats")
+	int32 Round = 0;
 };
 
 
