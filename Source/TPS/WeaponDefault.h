@@ -11,7 +11,7 @@
 #include "WeaponDefault.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnWeaponFireStart, UAnimMontage*, AnimFireChar);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnWeaponReloadStart, UAnimMontage*, Anim);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnWeaponReloadStart, UAnimMontage*, AnimReloadChar);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnWeaponReloadEnd, bool, bIsSuccess, int32, AmmoSafe);
 
 UCLASS()
@@ -39,7 +39,13 @@ public:
 	UPROPERTY(VisibleAnywhere)
 		FWeaponInfo WeaponSetting;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon Info")
-		FAnimationWeaponInfo AdditionalWeaponInfo;
+		FAddicionalWeaponInfo AdditionalWeaponInfo;
+
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FireLogic")
+		bool WeaponFiring = false;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ReloadLogic")
+		bool WeaponReloading = false;
 
 
 protected:
@@ -56,7 +62,7 @@ public:
 	void DispersionTick(float DeltaTime);
 	void WeaponInit();
 	void UpdateStateWeapon(EMovementState NewMovementState);
-	void ShellDropTick(float DeltaTime);
+	void FinishReload();
 
 	UFUNCTION(BlueprintCallable)
 	void SetWeaponStateFire(bool bIsFire);
@@ -69,9 +75,8 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 		int32 GetWeaponRound();
-	UFUNCTION()
 	void InitReload();
-	void FinishReload();
+	void CancelReload();
 
 	void ChangeDispersionByShot();
 	float GetCurrentDispersion() const;
@@ -81,16 +86,7 @@ public:
 	//flags
 	bool BlockFire = false;
 
-	//Timer Drop Magazine on reload
-	bool DropClipFlag = false;
-	float DropClipTimer = -1.0;
 
-	//shell flag
-	bool DropShellFlag = false;
-	float DropShellTimer = -1.0f;
-
-	UFUNCTION()
-	void InitDropMesh(UStaticMesh* DropMesh, FTransform Offset, FVector DropImpulseDirection, float LifeTimeMesh, float ImpulseRandomDispersion, float PowerImpulse, float CustomMass);
 
 	int8 GetNumberProjectileByShot() const;
 
@@ -111,8 +107,12 @@ public:
 	float CurrentDispersionRecoil = 0.1f;
 	float CurrentDispersionReduction = 0.1f;
 
-	bool CheckCanWeaponReload();
+	//Timer Drop Magazine on reload
+	bool DropClipFlag = false;
+	float DropClipTimer = -1.0;
+
 	int8 GetAviableAmmoForReload();
+	bool CheckAmmoForWeapon(EWeaponType TypeWeapon, int8& AviableAmmForWeapon);
 
 
 	//Timers

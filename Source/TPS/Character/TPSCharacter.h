@@ -5,6 +5,8 @@
 #include "FuncLibrary/Types.h"
 #include "CoreMinimal.h"
 #include "WeaponDefault.h"
+#include "Character/TPSInventoryComponent.h"
+
 #include "TPSCharacter.generated.h"
 
 UCLASS(Blueprintable)
@@ -29,6 +31,8 @@ public:
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	/** Returns CursorToWorld subobject **/
 	//FORCEINLINE class UDecalComponent* GetCursorToWorld() { return CursorToWorld; }
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	class UTPSInventoryComponent* InventoryComponent;
 
 private:
 	/** Top down camera */
@@ -108,19 +112,31 @@ public:
 	UDecalComponent* CurrentCursor = nullptr;
 
 	UFUNCTION(BlueprintCallable)
-		void InitWeapon(FName IdWeaponName);
+	void InitWeapon(FName IdWeaponName, FAdditionalWeaponInfo WeaponAdditionalInfo, int32 NewCurrentIndexWeapon);
 
 	UFUNCTION(BlueprintCallable)
 		AWeaponDefault* GetCurrentWeapon();
 
-		UFUNCTION()
+	UFUNCTION()
 		void WeaponReloadStart(UAnimMontage* Anim);
-		UFUNCTION()
-		void WeaponReloadEnd();
-		UFUNCTION(BlueprintNativeEvent)
+	UFUNCTION()
+		void WeaponReloadEnd(bool bIsSuccess, int32 AmmoTake);
+	UFUNCTION(BlueprintNativeEvent)
 		void WeaponReloadStart_BP(UAnimMontage* Anim);
-		UFUNCTION(BlueprintNativeEvent)
-		void WeaponReloadEnd_BP();
+	UFUNCTION(BlueprintNativeEvent)
+		void WeaponReloadEnd_BP(bool bIsSuccess);
+
+
+	UFUNCTION()
+		void WeaponFireStart(UAnimMontage* Anim);
+	UFUNCTION(BlueprintNativeEvent)
+		void WeaponFireStart_BP(UAnimMontage* Anim);
+
+		void TrySwicthNextWeapon();
+		void TrySwitchPreviosWeapon();
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+		int32 CurrentIndexWeapon = 0;
 
 
 

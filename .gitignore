@@ -13,3 +13,6 @@ Saved
 *.xcodeproj
 *.xcworkspace
 *et .
+*.neighborhood_house_types__1_
+*.Item
+*.clang-format
