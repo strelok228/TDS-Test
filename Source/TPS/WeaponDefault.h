@@ -41,13 +41,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon Info")
 		FAddicionalWeaponInfo AdditionalWeaponInfo;
 
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FireLogic")
-		bool WeaponFiring = false;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ReloadLogic")
-		bool WeaponReloading = false;
-
-
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -70,7 +63,7 @@ public:
 	bool CheckWeaponCanFire();
 
 	FProjectileInfo GetProjectile();
-
+	UFUNCTION()
 	void Fire();
 
 	UFUNCTION(BlueprintCallable)
@@ -86,7 +79,11 @@ public:
 	//flags
 	bool BlockFire = false;
 
-
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FireLogic")
+	bool WeaponFiring = false;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ReloadLogic")
+	bool WeaponReloading = false;
+	bool WeaponAiming = false;
 
 	int8 GetNumberProjectileByShot() const;
 
@@ -106,6 +103,9 @@ public:
 	float CurrentDispersionMin = 0.1f;
 	float CurrentDispersionRecoil = 0.1f;
 	float CurrentDispersionReduction = 0.1f;
+
+
+	bool CheckCanWeaponReload();
 
 	//Timer Drop Magazine on reload
 	bool DropClipFlag = false;

@@ -117,6 +117,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 		AWeaponDefault* GetCurrentWeapon();
 
+	UFUNCTION(BlueprintCallable)//VisualOnly
+		void RemoveCurrentWeapon();
+
 	UFUNCTION()
 		void WeaponReloadStart(UAnimMontage* Anim);
 	UFUNCTION()

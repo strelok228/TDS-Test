@@ -60,5 +60,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void AmmoSlotChangeValue(EWeaponType TypeWeapon, int32 CoutChangeAmmo);
 
+	int32 AviableAmmoForWeapon = 0;
+
+
 };
 

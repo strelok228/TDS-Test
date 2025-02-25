@@ -213,8 +213,8 @@ void ATPSCharacter::InitWeapon(FName IdWeaponName, FAdditionalWeaponInfo WeaponA
 					myWeapon->UpdateStateWeapon(MovementState);
 
 					myWeapon->AdditionalWeaponInfo = WeaponAdditionalInfo;
-					if(InventoryComponent)
-						CurrentIndexWeapon = InventoryComponent->GetWeaponIndexSlotByName(IdWeaponName);//fix
+					//if(InventoryComponent)
+					CurrentIndexWeapon = NewCurrentIndexWeapon;//fix
 
 					//Not Forget remove delegate on change/drop weapon
 					myWeapon->OnWeaponReloadStart.AddDynamic(this, &ATPSCharacter::WeaponReloadStart);
@@ -223,6 +223,11 @@ void ATPSCharacter::InitWeapon(FName IdWeaponName, FAdditionalWeaponInfo WeaponA
 					myWeapon->OnWeaponFireStart.AddDynamic(this, &ATPSCharacter::WeaponFireStart);
 
 					// after switch try reload weapon if needed
+					if (CurrentWeapon->GetWeaponRound() <= 0 && CurrentWeapon->CheckCanWeaponReload())
+						CurrentWeapon->InitReload();
+
+					if (InventoryComponent)
+						InventoryComponent->OnWeaponAmmoAviable.Broadcast(myWeapon->WeaponSetting.WeaponType);
 				}
 			}
 		}
@@ -236,6 +241,10 @@ void ATPSCharacter::InitWeapon(FName IdWeaponName, FAdditionalWeaponInfo WeaponA
 AWeaponDefault * ATPSCharacter::GetCurrentWeapon()
 {
 	return CurrentWeapon;
+}
+
+void ATPSCharacter::RemoveCurrentWeapon()
+{
 }
 
 void ATPSCharacter::WeaponReloadStart(UAnimMontage* Anim)

@@ -220,6 +220,8 @@ FProjectileInfo AWeaponDefault::GetProjectile()
 
 void AWeaponDefault::Fire()
 {
+	UAnimMontage* AnimToPlay = nullptr;
+
 	FireTimer = WeaponSetting.RateOfFire;
 	AdditionalWeaponInfo.Round = AdditionalWeaponInfo.Round - 1;
 	ChangeDispersionByShot();
@@ -366,6 +368,25 @@ FVector AWeaponDefault::ApplyDispersionToShoot(FVector DirectionShoot) const
 	return FMath::VRandCone(DirectionShoot, GetCurrentDispersion() * PI / 180.f);
 }
 
+bool AWeaponDefault::CheckCanWeaponReload()
+{
+	bool result = true;
+	if (GetOwner())
+	{
+		UTPSInventoryComponent* MyInv = Cast<UTPSInventoryComponent>(GetOwner()->GetComponentByClass(UTPSInventoryComponent::StaticClass()));
+		if (MyInv)
+		{
+			int8 AviableAmmoForWeapon;
+			if (!MyInv->CheckAmmoForWeapon(WeaponSetting.WeaponType, AviableAmmoForWeapon))
+			{
+				result = false;
+			}
+		}
+	}
+
+	return result;
+}
+
 int8 AWeaponDefault::GetAviableAmmoForReload()
 {
 	int8 AviableAmmoForWeapon = WeaponSetting.MaxRound;
@@ -381,31 +402,4 @@ int8 AWeaponDefault::GetAviableAmmoForReload()
 		}
 	}
 	return AviableAmmoForWeapon;
-}
-
-bool AWeaponDefault::CheckAmmoForWeapon(EWeaponType TypeWeapon, int8 &AviableAmmForWeapon)
-{
-	AviableAmmoForWeapon = 0;
-	bool bIsFind = false;
-	int8 i = 0;
-	while (i < AmmoSlots.Num() && !bIsFind)
-	{
-		if (AmmoSlots[i].WeaponType == TypeWeapon)
-		{
-			bIsFind = true;
-			AviableAmmoForWeapon = AmmoSlots[i].Cout;
-			if (AmmoSlots[i].Cout > 0)
-			{
-				//OnWeaponAmmoAviable.Broadcast(TypeWeapon);//remove not here, only when pickUp ammo this type, or swithc weapon
-				return true;
-			}
-
-		}
-
-		i++;
-	}
-
-	OnWeaponAmmoEmpty.Broadcast(TypeWeapon);//visual empty ammo slot
-
-	return false;
 }

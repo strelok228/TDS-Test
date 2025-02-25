@@ -75,9 +75,6 @@ bool UTPSInventoryComponent::SwitchWeaponToIndex(int32 ChangeToIndex, int32 OldI
 	FAdditionalWeaponInfo NewAdditionalInfo;
 	int32 NewCurrentIndex = 0;
 
-
-
-
 	if (WeaponSlots.IsValidIndex(CorrectIndex))
 	{
 		if (!WeaponSlots[CorrectIndex].NameItem.IsNone())
@@ -117,18 +114,287 @@ bool UTPSInventoryComponent::SwitchWeaponToIndex(int32 ChangeToIndex, int32 OldI
 				NewAdditionalInfo = WeaponSlots[CorrectIndex].AdditionalInfo;
 			}
 		}
-
-
-		if (bIsSuccess)
-		{
-			SetAdditionalInfoWeapon(OldIndex, OldInfo);
-			OnSwitchWeapon.Broadcast(NewIdWeapon, NewAdditionalInfo, NewCurrentIndex);
-			//OnWeaponAmmoAviable.Broadcast()
-		}
-
-		return bIsSuccess;
 	}
+
+	if (!bIsSuccess)
+	{
+		if (bIsForward)
+		{
+			int8 iteration = 0;
+			int8 Seconditeration = 0;
+			while (iteration < WeaponSlots.Num() && !bIsSuccess)
+			{
+				iteration++;
+				int8 tmpIndex = ChangeToIndex + iteration;
+				if (WeaponSlots.IsValidIndex(tmpIndex))
+				{
+					if (!WeaponSlots[tmpIndex].NameItem.IsNone())
+					{
+						if (WeaponSlots[tmpIndex].AdditionalInfo.Round > 0)
+						{
+							//WeaponGood
+							bIsSuccess = true;
+							NewIdWeapon = WeaponSlots[tmpIndex].NameItem;
+							NewAdditionalInfo = WeaponSlots[tmpIndex].AdditionalInfo;
+							NewCurrentIndex = tmpIndex;
+						}
+						else
+						{
+							FWeaponInfo myInfo;
+							UTPSGameInstance* myGI = Cast<UTPSGameInstance>(GetWorld()->GetGameInstance());
+
+							myGI->GetWeaponInfoByName(WeaponSlots[tmpIndex].NameItem, myInfo);
+
+							bool bIsFind = false;
+							int8 j = 0;
+							while (j < AmmoSlots.Num() && !bIsFind)
+							{
+								if (AmmoSlots[j].WeaponType == myInfo.WeaponType && AmmoSlots[j].Cout > 0)
+								{
+									//WeaponGood
+									bIsSuccess = true;
+									NewIdWeapon = WeaponSlots[tmpIndex].NameItem;
+									NewAdditionalInfo = WeaponSlots[tmpIndex].AdditionalInfo;
+									NewCurrentIndex = tmpIndex;
+									bIsFind = true;
+								}
+								j++;
+							}
+						}
+					}
+				}
+				else
+				{
+					//go to end of right of array weapon slots
+					if (OldIndex != Seconditeration)
+					{
+						if (WeaponSlots.IsValidIndex(Seconditeration))
+						{
+							if (!WeaponSlots[Seconditeration].NameItem.IsNone())
+							{
+								if (WeaponSlots[Seconditeration].AdditionalInfo.Round > 0)
+								{
+									//WeaponGood
+									bIsSuccess = true;
+									NewIdWeapon = WeaponSlots[Seconditeration].NameItem;
+									NewAdditionalInfo = WeaponSlots[Seconditeration].AdditionalInfo;
+									NewCurrentIndex = Seconditeration;
+								}
+								else
+								{
+									FWeaponInfo myInfo;
+									UTPSGameInstance* myGI = Cast<UTPSGameInstance>(GetWorld()->GetGameInstance());
+
+									myGI->GetWeaponInfoByName(WeaponSlots[Seconditeration].NameItem, myInfo);
+
+									bool bIsFind = false;
+									int8 j = 0;
+									while (j < AmmoSlots.Num() && !bIsFind)
+									{
+										if (AmmoSlots[j].WeaponType == myInfo.WeaponType && AmmoSlots[j].Cout > 0)
+										{
+											//WeaponGood
+											bIsSuccess = true;
+											NewIdWeapon = WeaponSlots[Seconditeration].NameItem;
+											NewAdditionalInfo = WeaponSlots[Seconditeration].AdditionalInfo;
+											NewCurrentIndex = Seconditeration;
+											bIsFind = true;
+										}
+										j++;
+									}
+								}
+							}
+						}
+					}
+					else
+					{
+						//go to same weapon when start
+						if (WeaponSlots.IsValidIndex(Seconditeration))
+						{
+							if (!WeaponSlots[Seconditeration].NameItem.IsNone())
+							{
+								if (WeaponSlots[Seconditeration].AdditionalInfo.Round > 0)
+								{
+									//WeaponGood, it same weapon do nothing
+								}
+								else
+								{
+									FWeaponInfo myInfo;
+									UTPSGameInstance* myGI = Cast<UTPSGameInstance>(GetWorld()->GetGameInstance());
+
+									myGI->GetWeaponInfoByName(WeaponSlots[Seconditeration].NameItem, myInfo);
+
+									bool bIsFind = false;
+									int8 j = 0;
+									while (j < AmmoSlots.Num() && !bIsFind)
+									{
+										if (AmmoSlots[j].WeaponType == myInfo.WeaponType)
+										{
+											if (AmmoSlots[j].Cout > 0)
+											{
+												//WeaponGood, it same weapon do nothing
+											}
+											else
+											{
+												//Not find weapon with amm need init Pistol with infinity ammo
+												UE_LOG(LogTemp, Error, TEXT("UTPSInventoryComponent::SwitchWeaponToIndex - Init PISTOL - NEED"));
+											}
+										}
+										j++;
+									}
+								}
+							}
+						}
+					}
+					Seconditeration++;
+				}
+			}
+		}
+		else
+		{
+			int8 iteration = 0;
+			int8 Seconditeration = WeaponSlots.Num() - 1;
+			while (iteration < WeaponSlots.Num() && !bIsSuccess)
+			{
+				iteration++;
+				int8 tmpIndex = ChangeToIndex - iteration;
+				if (WeaponSlots.IsValidIndex(tmpIndex))
+				{
+					if (!WeaponSlots[tmpIndex].NameItem.IsNone())
+					{
+						if (WeaponSlots[tmpIndex].AdditionalInfo.Round > 0)
+						{
+							//WeaponGood
+							bIsSuccess = true;
+							NewIdWeapon = WeaponSlots[tmpIndex].NameItem;
+							NewAdditionalInfo = WeaponSlots[tmpIndex].AdditionalInfo;
+							NewCurrentIndex = tmpIndex;
+						}
+						else
+						{
+							FWeaponInfo myInfo;
+							UTPSGameInstance* myGI = Cast<UTPSGameInstance>(GetWorld()->GetGameInstance());
+
+							myGI->GetWeaponInfoByName(WeaponSlots[tmpIndex].NameItem, myInfo);
+
+							bool bIsFind = false;
+							int8 j = 0;
+							while (j < AmmoSlots.Num() && !bIsFind)
+							{
+								if (AmmoSlots[j].WeaponType == myInfo.WeaponType && AmmoSlots[j].Cout > 0)
+								{
+									//WeaponGood
+									bIsSuccess = true;
+									NewIdWeapon = WeaponSlots[tmpIndex].NameItem;
+									NewAdditionalInfo = WeaponSlots[tmpIndex].AdditionalInfo;
+									NewCurrentIndex = tmpIndex;
+									bIsFind = true;
+								}
+								j++;
+							}
+						}
+					}
+				}
+				else
+				{
+					//go to end of LEFT of array weapon slots
+					if (OldIndex != Seconditeration)
+					{
+						if (WeaponSlots.IsValidIndex(Seconditeration))
+						{
+							if (!WeaponSlots[Seconditeration].NameItem.IsNone())
+							{
+								if (WeaponSlots[Seconditeration].AdditionalInfo.Round > 0)
+								{
+									//WeaponGood
+									bIsSuccess = true;
+									NewIdWeapon = WeaponSlots[Seconditeration].NameItem;
+									NewAdditionalInfo = WeaponSlots[Seconditeration].AdditionalInfo;
+									NewCurrentIndex = Seconditeration;
+								}
+								else
+								{
+									FWeaponInfo myInfo;
+									UTPSGameInstance* myGI = Cast<UTPSGameInstance>(GetWorld()->GetGameInstance());
+
+									myGI->GetWeaponInfoByName(WeaponSlots[Seconditeration].NameItem, myInfo);
+
+									bool bIsFind = false;
+									int8 j = 0;
+									while (j < AmmoSlots.Num() && !bIsFind)
+									{
+										if (AmmoSlots[j].WeaponType == myInfo.WeaponType && AmmoSlots[j].Cout > 0)
+										{
+											//WeaponGood
+											bIsSuccess = true;
+											NewIdWeapon = WeaponSlots[Seconditeration].NameItem;
+											NewAdditionalInfo = WeaponSlots[Seconditeration].AdditionalInfo;
+											NewCurrentIndex = Seconditeration;
+											bIsFind = true;
+										}
+										j++;
+									}
+								}
+							}
+						}
+					}
+					else
+					{
+						//go to same weapon when start
+						if (WeaponSlots.IsValidIndex(Seconditeration))
+						{
+							if (!WeaponSlots[Seconditeration].NameItem.IsNone())
+							{
+								if (WeaponSlots[Seconditeration].AdditionalInfo.Round > 0)
+								{
+									//WeaponGood, it same weapon do nothing
+								}
+								else
+								{
+									FWeaponInfo myInfo;
+									UTPSGameInstance* myGI = Cast<UTPSGameInstance>(GetWorld()->GetGameInstance());
+
+									myGI->GetWeaponInfoByName(WeaponSlots[Seconditeration].NameItem, myInfo);
+
+									bool bIsFind = false;
+									int8 j = 0;
+									while (j < AmmoSlots.Num() && !bIsFind)
+									{
+										if (AmmoSlots[j].WeaponType == myInfo.WeaponType)
+										{
+											if (AmmoSlots[j].Cout > 0)
+											{
+												//WeaponGood, it same weapon do nothing
+											}
+											else
+											{
+												//Not find weapon with amm need init Pistol with infinity ammo
+												UE_LOG(LogTemp, Error, TEXT("UTPSInventoryComponent::SwitchWeaponToIndex - Init PISTOL - NEED"));
+											}
+										}
+										j++;
+									}
+								}
+							}
+						}
+					}
+					Seconditeration--;
+				}
+			}
+		}
+	}
+
+	if (bIsSuccess)
+	{
+		SetAdditionalInfoWeapon(OldIndex, OldInfo);
+		OnSwitchWeapon.Broadcast(NewIdWeapon, NewAdditionalInfo, NewCurrentIndex);
+		//OnWeaponAmmoAviable.Broadcast()
+	}
+
+
+	return bIsSuccess;
 }
+
 FAdditionalWeaponInfo UTPSInventoryComponent::GetAdditionalInfoWeapon(int32 IndexWeapon)
 {
 	return FAdditionalWeaponInfo();
