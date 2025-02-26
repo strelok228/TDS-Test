@@ -269,7 +269,11 @@ void ATPSCharacter::WeaponReloadStart_BP_Implementation(UAnimMontage* Anim)
 
 void ATPSCharacter::WeaponReloadEnd_BP_Implementation(bool bIsSuccess)
 {
+	// in BP
+}
 
+void ATPSCharacter::WeaponFireStart_BP_Implementation(UAnimMontage* Anim)
+{
 	// in BP
 }
 
@@ -458,10 +462,6 @@ void ATPSCharacter::WeaponFireStart(UAnimMontage* Anim)
 	if (InventoryComponent && CurrentWeapon)
 		InventoryComponent->SetAdditionalInfoWeapon(CurrentIndexWeapon, CurrentWeapon->AdditionalWeaponInfo);
 	WeaponFireStart_BP(Anim);
-}
-
-void ATPSCharacter::WeaponFireStart_BP(UAnimMontage* Anim)
-{
 }
 
 void ATPSCharacter::TrySwicthNextWeapon()
