@@ -1,4 +1,4 @@
-	// Fill out your copyright notice in the Description page of Project Settings.
+// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -160,62 +160,23 @@ struct FWeaponInfo : public FTableRowBase
 	UDecalComponent* DecalOnHit = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Anim ")
-	FAnimationWeaponInfo AnimWeaponInfo;
+	UAnimMontage* AnimCharFire = nullptr;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Anim ")
+	UAnimMontage* AnimCharReload = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mesh ")
-	FDropMeshInfo ClipDropMesh;
+	UStaticMesh* MagazineDrop = nullptr;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mesh ")
-	FDropMeshInfo ShellBullets;
+	UStaticMesh* ShellBullets = nullptr;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory ")
+	float SwitchTimeToWeapon = 1.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory ")
+	UTexture2D* WeaponIcon = nullptr;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory ")
 	EWeaponType WeaponType = EWeaponType::RifleType;
 
-};
-
-USTRUCT(BlueprintType)
-struct FAnimationWeaponInfo
-{
-	GENERATED_BODY()
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Anim Char")
-	UAnimMontage* AnimCharFire = nullptr;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Anim Char")
-	UAnimMontage* AnimCharFireAim = nullptr;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Anim Char")
-	UAnimMontage* AnimCharReload = nullptr;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Anim Char")
-	UAnimMontage* AnimCharReloadAim = nullptr;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Anim Weapon")
-	UAnimMontage* AnimWeaponReload = nullptr;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Anim Weapon")
-	UAnimMontage* AnimWeaponReloadAim = nullptr;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Anim Weapon")
-	UAnimMontage* AnimWeaponFire = nullptr;
-};
-
-USTRUCT(BlueprintType)
-struct FDropMeshInfo
-{
-	GENERATED_BODY()
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "DropMesh")
-	UStaticMesh* DropMesh = nullptr;
-	//0.0f immediately drop
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "DropMesh ")
-	float DropMeshTime = -1.0f;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "DropMesh ")
-	float DropMeshLifeTime = 5.0f;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "DropMesh ")
-	FTransform DropMeshOffset = FTransform();
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "DropMesh ")
-	FVector DropMeshImpulseDir = FVector(0.0f);
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "DropMesh ")
-	float PowerImpulse = 0.0f;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "DropMesh ")
-	float ImpulseRandomDispersion = 0.0f;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "DropMesh ")
-	float CustomMass = 0.0f;
 };
 
 USTRUCT(BlueprintType)
