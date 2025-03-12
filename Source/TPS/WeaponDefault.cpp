@@ -270,6 +270,13 @@ void AWeaponDefault::Fire()
 			}
 		}
 	}
+
+	if (GetWeaponRound() <= 0 && !WeaponReloading)
+	{
+		//Init Reload
+		if (CheckCanWeaponReload())
+			InitReload();
+	}
 }
 
 int32 AWeaponDefault::GetWeaponRound()

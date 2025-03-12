@@ -238,6 +238,7 @@ void ATPSCharacter::InitWeapon(FName IdWeaponName, FAdditionalWeaponInfo WeaponA
 	}
 }
 
+
 AWeaponDefault * ATPSCharacter::GetCurrentWeapon()
 {
 	return CurrentWeapon;
