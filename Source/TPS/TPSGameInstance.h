@@ -4,8 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "Engine/GameInstance.h"
-#include "Engine/DataTable.h"
 #include "FuncLibrary/Types.h"
+#include "Engine/DataTable.h"
 #include "WeaponDefault.h"
 #include "TPSGameInstance.generated.h"
 
@@ -21,7 +21,11 @@ public:
 	//table
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = " WeaponSetting ")
 		UDataTable* WeaponInfoTable = nullptr;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = " WeaponSetting ")
+		UDataTable* DropItemInfoTable = nullptr;
 	UFUNCTION(BlueprintCallable)
 		bool GetWeaponInfoByName(FName NameWeapon, FWeaponInfo& OutInfo);
+	UFUNCTION(BlueprintCallable)
+		bool GetDropItemInfoByName(FName NameItem, FDropItem& OutInfo);
 	
 };

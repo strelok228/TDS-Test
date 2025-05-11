@@ -35,6 +35,7 @@ AWeaponDefault::AWeaponDefault()
 void AWeaponDefault::BeginPlay() 
 {
 	Super::BeginPlay();
+
 	WeaponInit();
 }
 
@@ -46,18 +47,22 @@ void AWeaponDefault::Tick(float DeltaTime)
 	FireTick(DeltaTime);
 	ReloadTick(DeltaTime);
 	DispersionTick(DeltaTime);
+	ClipDropTick(DeltaTime);
+	ShellDropTick(DeltaTime);
 }
 
 void AWeaponDefault::FireTick(float DeltaTime)
 {
-	if (WeaponFiring && GetWeaponRound() > 0 && !WeaponReloading)
+	if (GetWeaponRound() > 0)
 	{
-		if (FireTimer < 0.f)
-		{
-			Fire();
-		}
-		else
-			FireTimer -= DeltaTime;
+		if (WeaponFiring)
+			if (FireTimer < 0.f)
+			{
+				if (!WeaponReloading)
+					Fire();
+			}
+			else
+				FireTimer -= DeltaTime;
 	}
 }
 
@@ -106,6 +111,34 @@ void AWeaponDefault::DispersionTick(float DeltaTime)
 		UE_LOG(LogTemp, Warning, TEXT("Dispersion: MAX = %f. MIN = %f. Current = %f"), CurrentDispersionMax, CurrentDispersionMin, CurrentDispersion);
 }
 
+void AWeaponDefault::ClipDropTick(float DeltaTime)
+{
+	if (DropClipFlag)
+	{
+		if (DropClipTimer < 0.0f)
+		{
+			DropClipFlag = false;
+			InitDropMesh(WeaponSetting.ClipDropMesh.DropMesh, WeaponSetting.ClipDropMesh.DropMeshOffset, WeaponSetting.ClipDropMesh.DropMeshImpulseDir, WeaponSetting.ClipDropMesh.DropMeshLifeTime, WeaponSetting.ClipDropMesh.ImpulseRandomDispersion, WeaponSetting.ClipDropMesh.PowerImpulse, WeaponSetting.ClipDropMesh.CustomMass);
+		}
+		else
+			DropClipTimer -= DeltaTime;
+	}
+}
+
+void AWeaponDefault::ShellDropTick(float DeltaTime)
+{
+	if (DropShellFlag)
+	{
+		if (DropShellTimer < 0.0f)
+		{
+			DropShellFlag = false;
+			InitDropMesh(WeaponSetting.ShellBullets.DropMesh, WeaponSetting.ShellBullets.DropMeshOffset, WeaponSetting.ShellBullets.DropMeshImpulseDir, WeaponSetting.ShellBullets.DropMeshLifeTime, WeaponSetting.ShellBullets.ImpulseRandomDispersion, WeaponSetting.ShellBullets.PowerImpulse, WeaponSetting.ShellBullets.CustomMass);
+		}
+		else
+			DropShellTimer -= DeltaTime;
+	}
+}
+
 void AWeaponDefault::WeaponInit()
 {
 	if (SkeletalMeshWeapon && !SkeletalMeshWeapon->SkeletalMesh)
@@ -121,74 +154,6 @@ void AWeaponDefault::WeaponInit()
 	UpdateStateWeapon(EMovementState::Run_State);
 }
 
-void AWeaponDefault::UpdateStateWeapon(EMovementState NewMovementState)
-{
-	{
-		//ToDo Dispersion
-		BlockFire = false;
-
-		switch (NewMovementState)
-		{
-		case EMovementState::Aim_State:
-
-			CurrentDispersionMax = WeaponSetting.DispersionWeapon.Aim_StateDispersionAimMax;
-			CurrentDispersionMin = WeaponSetting.DispersionWeapon.Aim_StateDispersionAimMin;
-			CurrentDispersionRecoil = WeaponSetting.DispersionWeapon.Aim_StateDispersionAimRecoil;
-			CurrentDispersionReduction = WeaponSetting.DispersionWeapon.Aim_StateDispersionReduction;
-			break;
-		case EMovementState::AimWalk_State:
-
-			CurrentDispersionMax = WeaponSetting.DispersionWeapon.AimWalk_StateDispersionAimMax;
-			CurrentDispersionMin = WeaponSetting.DispersionWeapon.AimWalk_StateDispersionAimMin;
-			CurrentDispersionRecoil = WeaponSetting.DispersionWeapon.AimWalk_StateDispersionAimRecoil;
-			CurrentDispersionReduction = WeaponSetting.DispersionWeapon.Aim_StateDispersionReduction;
-			break;
-		case EMovementState::Walk_State:
-
-			CurrentDispersionMax = WeaponSetting.DispersionWeapon.Walk_StateDispersionAimMax;
-			CurrentDispersionMin = WeaponSetting.DispersionWeapon.Walk_StateDispersionAimMin;
-			CurrentDispersionRecoil = WeaponSetting.DispersionWeapon.Walk_StateDispersionAimRecoil;
-			CurrentDispersionReduction = WeaponSetting.DispersionWeapon.Aim_StateDispersionReduction;
-			break;
-		case EMovementState::Run_State:
-
-			CurrentDispersionMax = WeaponSetting.DispersionWeapon.Run_StateDispersionAimMax;
-			CurrentDispersionMin = WeaponSetting.DispersionWeapon.Run_StateDispersionAimMin;
-			CurrentDispersionRecoil = WeaponSetting.DispersionWeapon.Run_StateDispersionAimRecoil;
-			CurrentDispersionReduction = WeaponSetting.DispersionWeapon.Aim_StateDispersionReduction;
-			break;
-		case EMovementState::SprintRun_State:
-			BlockFire = true;
-			SetWeaponStateFire(false);//set fire trigger to false
-			//Block Fire
-			break;
-		default:
-			break;
-		}
-	}
-}
-
-void AWeaponDefault::FinishReload()
-{
-	WeaponReloading = false;
-
-	int8 AviableAmmoFromInventory = GetAviableAmmoForReload();
-	int8 AmmoNeedTakeFromInv;
-	int8 NeedToReload = WeaponSetting.MaxRound - AdditionalWeaponInfo.Round;
-
-	if (NeedToReload > AviableAmmoFromInventory)
-	{
-		AdditionalWeaponInfo.Round = AviableAmmoFromInventory;
-		AmmoNeedTakeFromInv = AviableAmmoFromInventory;
-	}
-	else
-	{
-		AdditionalWeaponInfo.Round += NeedToReload;
-		AmmoNeedTakeFromInv = NeedToReload;
-	}
-
-	OnWeaponReloadEnd.Broadcast(true, -AmmoNeedTakeFromInv);
-}
 
 void AWeaponDefault::SetWeaponStateFire(bool bIsFire)
 {
@@ -196,7 +161,7 @@ void AWeaponDefault::SetWeaponStateFire(bool bIsFire)
 		WeaponFiring = bIsFire;
 	else
 		WeaponFiring = false;
-		FireTimer = 0.01f;//!!!!!
+	FireTimer = 0.01f;//!!!!!
 }
 
 bool AWeaponDefault::CheckWeaponCanFire()
@@ -216,6 +181,19 @@ void AWeaponDefault::Fire()
 	FireTimer = WeaponSetting.RateOfFire;
 	AdditionalWeaponInfo.Round = AdditionalWeaponInfo.Round - 1;
 	ChangeDispersionByShot();
+
+	if (WeaponSetting.ShellBullets.DropMesh)
+	{
+		if (WeaponSetting.ShellBullets.DropMeshTime < 0.0f)
+		{
+			InitDropMesh(WeaponSetting.ShellBullets.DropMesh, WeaponSetting.ShellBullets.DropMeshOffset, WeaponSetting.ShellBullets.DropMeshImpulseDir, WeaponSetting.ShellBullets.DropMeshLifeTime, WeaponSetting.ShellBullets.ImpulseRandomDispersion, WeaponSetting.ShellBullets.PowerImpulse, WeaponSetting.ShellBullets.CustomMass);
+		}
+		else
+		{
+			DropShellFlag = true;
+			DropShellTimer = WeaponSetting.ShellBullets.DropMeshTime;
+		}
+	}
 
 	OnWeaponFireStart.Broadcast(AnimToPlay);
 
@@ -279,32 +257,53 @@ void AWeaponDefault::Fire()
 	}
 }
 
-int32 AWeaponDefault::GetWeaponRound()
+void AWeaponDefault::UpdateStateWeapon(EMovementState NewMovementState)
 {
-	return AdditionalWeaponInfo.Round;
+	{
+		//ToDo Dispersion
+		BlockFire = false;
+
+		switch (NewMovementState)
+		{
+		case EMovementState::Aim_State:
+
+			CurrentDispersionMax = WeaponSetting.DispersionWeapon.Aim_StateDispersionAimMax;
+			CurrentDispersionMin = WeaponSetting.DispersionWeapon.Aim_StateDispersionAimMin;
+			CurrentDispersionRecoil = WeaponSetting.DispersionWeapon.Aim_StateDispersionAimRecoil;
+			CurrentDispersionReduction = WeaponSetting.DispersionWeapon.Aim_StateDispersionReduction;
+			break;
+		case EMovementState::AimWalk_State:
+
+			CurrentDispersionMax = WeaponSetting.DispersionWeapon.AimWalk_StateDispersionAimMax;
+			CurrentDispersionMin = WeaponSetting.DispersionWeapon.AimWalk_StateDispersionAimMin;
+			CurrentDispersionRecoil = WeaponSetting.DispersionWeapon.AimWalk_StateDispersionAimRecoil;
+			CurrentDispersionReduction = WeaponSetting.DispersionWeapon.Aim_StateDispersionReduction;
+			break;
+		case EMovementState::Walk_State:
+
+			CurrentDispersionMax = WeaponSetting.DispersionWeapon.Walk_StateDispersionAimMax;
+			CurrentDispersionMin = WeaponSetting.DispersionWeapon.Walk_StateDispersionAimMin;
+			CurrentDispersionRecoil = WeaponSetting.DispersionWeapon.Walk_StateDispersionAimRecoil;
+			CurrentDispersionReduction = WeaponSetting.DispersionWeapon.Aim_StateDispersionReduction;
+			break;
+		case EMovementState::Run_State:
+
+			CurrentDispersionMax = WeaponSetting.DispersionWeapon.Run_StateDispersionAimMax;
+			CurrentDispersionMin = WeaponSetting.DispersionWeapon.Run_StateDispersionAimMin;
+			CurrentDispersionRecoil = WeaponSetting.DispersionWeapon.Run_StateDispersionAimRecoil;
+			CurrentDispersionReduction = WeaponSetting.DispersionWeapon.Aim_StateDispersionReduction;
+			break;
+		case EMovementState::SprintRun_State:
+			BlockFire = true;
+			SetWeaponStateFire(false);//set fire trigger to false
+			//Block Fire
+			break;
+		default:
+			break;
+		}
+	}
 }
 
-void AWeaponDefault::InitReload()
-{
-	WeaponReloading = true;
-
-	ReloadTimer = WeaponSetting.ReloadTime;
-
-	//ToDo Anim reload
-	if (WeaponSetting.AnimCharReload)
-		OnWeaponReloadStart.Broadcast(WeaponSetting.AnimCharReload);
-}
-
-void AWeaponDefault::CancelReload()
-{
-	WeaponReloading = false;
-	if (SkeletalMeshWeapon && SkeletalMeshWeapon->GetAnimInstance())
-		SkeletalMeshWeapon->GetAnimInstance()->StopAllMontages(0.15f);
-
-	OnWeaponReloadEnd.Broadcast(false, 0);
-	DropClipFlag = false;
-}
-		
 void AWeaponDefault::ChangeDispersionByShot()
 {
 	CurrentDispersion = CurrentDispersion + CurrentDispersionRecoil;
@@ -316,9 +315,14 @@ float AWeaponDefault::GetCurrentDispersion() const
 	return Result;
 }
 
+FVector AWeaponDefault::ApplyDispersionToShoot(FVector DirectionShoot) const
+{
+	return FMath::VRandCone(DirectionShoot, GetCurrentDispersion() * PI / 180.f);
+}
+
 FVector AWeaponDefault::GetFireEndLocation() const
 {
-	
+
 	bool bShootDirection = false;
 	FVector EndLocation = FVector(0.f);
 
@@ -353,7 +357,7 @@ FVector AWeaponDefault::GetFireEndLocation() const
 
 
 	return EndLocation;
-	
+
 }
 
 int8 AWeaponDefault::GetNumberProjectileByShot() const
@@ -361,10 +365,84 @@ int8 AWeaponDefault::GetNumberProjectileByShot() const
 	return WeaponSetting.NumberProjectileByShot;
 }
 
-FVector AWeaponDefault::ApplyDispersionToShoot(FVector DirectionShoot) const
+int32 AWeaponDefault::GetWeaponRound()
 {
-	return FMath::VRandCone(DirectionShoot, GetCurrentDispersion() * PI / 180.f);
+	return AdditionalWeaponInfo.Round;
 }
+
+void AWeaponDefault::InitReload()
+{
+	WeaponReloading = true;
+
+	ReloadTimer = WeaponSetting.ReloadTime;
+
+	UAnimMontage* AnimToPlay = nullptr;
+	if (WeaponAiming)
+		AnimToPlay = WeaponSetting.AnimWeaponInfo.AnimCharReloadAim;
+	else
+		AnimToPlay = WeaponSetting.AnimWeaponInfo.AnimCharReload;
+
+	OnWeaponReloadStart.Broadcast(AnimToPlay);
+
+	UAnimMontage* AnimWeaponToPlay = nullptr;
+	if (WeaponAiming)
+		AnimWeaponToPlay = WeaponSetting.AnimWeaponInfo.AnimWeaponReloadAim;
+	else
+		AnimWeaponToPlay = WeaponSetting.AnimWeaponInfo.AnimWeaponReload;
+
+	if (WeaponSetting.AnimWeaponInfo.AnimWeaponReload
+		&& SkeletalMeshWeapon
+		&& SkeletalMeshWeapon->GetAnimInstance())//Bad Code? maybe best way init local variable or in func
+	{
+		SkeletalMeshWeapon->GetAnimInstance()->Montage_Play(AnimWeaponToPlay);
+	}
+
+
+	if (WeaponSetting.ClipDropMesh.DropMesh)
+	{
+		DropClipFlag = true;
+		DropClipTimer = WeaponSetting.ClipDropMesh.DropMeshTime;
+	}
+
+}
+
+
+
+void AWeaponDefault::FinishReload()
+{
+	WeaponReloading = false;
+
+	int8 AviableAmmoFromInventory = GetAviableAmmoForReload();
+	int8 AmmoNeedTakeFromInv;
+	int8 NeedToReload = WeaponSetting.MaxRound - AdditionalWeaponInfo.Round;
+
+	if (NeedToReload > AviableAmmoFromInventory)
+	{
+		AdditionalWeaponInfo.Round = AviableAmmoFromInventory;
+		AmmoNeedTakeFromInv = AviableAmmoFromInventory;
+	}
+	else
+	{
+		AdditionalWeaponInfo.Round += NeedToReload;
+		AmmoNeedTakeFromInv = NeedToReload;
+	}
+
+	OnWeaponReloadEnd.Broadcast(true, -AmmoNeedTakeFromInv);
+}
+
+
+
+void AWeaponDefault::CancelReload()
+{
+	WeaponReloading = false;
+	if (SkeletalMeshWeapon && SkeletalMeshWeapon->GetAnimInstance())
+		SkeletalMeshWeapon->GetAnimInstance()->StopAllMontages(0.15f);
+
+	OnWeaponReloadEnd.Broadcast(false, 0);
+	DropClipFlag = false;
+}
+		
+
 
 bool AWeaponDefault::CheckCanWeaponReload()
 {
@@ -400,4 +478,84 @@ int8 AWeaponDefault::GetAviableAmmoForReload()
 		}
 	}
 	return AviableAmmoForWeapon;
+}
+void AWeaponDefault::InitDropMesh(UStaticMesh* DropMesh, FTransform Offset, FVector DropImpulseDirection, float LifeTimeMesh, float ImpulseRandomDispersion, float PowerImpulse, float CustomMass)
+{
+
+	//CreateDefaultSubobject() Not use
+
+	//Not actor for abstract object
+	//if (WeaponSetting.MagazineDrop)
+	//{
+	//	UStaticMeshComponent* newStaticMesh = NewObject<UStaticMeshComponent>(this, FName("DropClipStaticMesh"));
+	//	if (newStaticMesh)
+	//	{
+	//		newStaticMesh->SetStaticMesh(WeaponSetting.MagazineDrop);		
+	//		//...
+	//	}
+	//}
+
+	if (DropMesh)
+	{
+		FTransform Transform;
+
+		FVector LocalDir = this->GetActorForwardVector() * Offset.GetLocation().X + this->GetActorRightVector() * Offset.GetLocation().Y + this->GetActorUpVector() * Offset.GetLocation().Z;
+
+		Transform.SetLocation(GetActorLocation() + LocalDir);
+		Transform.SetScale3D(Offset.GetScale3D());
+
+		Transform.SetRotation((GetActorRotation() + Offset.Rotator()).Quaternion());
+		AStaticMeshActor* NewActor = nullptr;
+
+
+		FActorSpawnParameters Param;
+		Param.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+		Param.Owner = this;
+		NewActor = GetWorld()->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass(), Transform, Param);
+
+		if (NewActor && NewActor->GetStaticMeshComponent())
+		{
+			NewActor->GetStaticMeshComponent()->SetCollisionProfileName(TEXT("IgnoreOnlyPawn"));
+			NewActor->GetStaticMeshComponent()->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
+
+			//set parameter for new actor
+			NewActor->SetActorTickEnabled(false);
+			NewActor->InitialLifeSpan = LifeTimeMesh;
+
+			NewActor->GetStaticMeshComponent()->Mobility = EComponentMobility::Movable;
+			NewActor->GetStaticMeshComponent()->SetSimulatePhysics(true);
+			NewActor->GetStaticMeshComponent()->SetStaticMesh(DropMesh);
+			//NewActor->GetStaticMeshComponent()->SetCollisionObjectType()
+
+
+
+			NewActor->GetStaticMeshComponent()->SetCollisionResponseToChannel(ECC_GameTraceChannel1, ECollisionResponse::ECR_Ignore);
+			NewActor->GetStaticMeshComponent()->SetCollisionResponseToChannel(ECC_GameTraceChannel2, ECollisionResponse::ECR_Ignore);
+			NewActor->GetStaticMeshComponent()->SetCollisionResponseToChannel(ECC_Pawn, ECollisionResponse::ECR_Ignore);
+			NewActor->GetStaticMeshComponent()->SetCollisionResponseToChannel(ECC_WorldStatic, ECollisionResponse::ECR_Block);
+			NewActor->GetStaticMeshComponent()->SetCollisionResponseToChannel(ECC_WorldDynamic, ECollisionResponse::ECR_Block);
+			NewActor->GetStaticMeshComponent()->SetCollisionResponseToChannel(ECC_PhysicsBody, ECollisionResponse::ECR_Block);
+
+
+
+			if (CustomMass > 0.0f)
+			{
+				NewActor->GetStaticMeshComponent()->SetMassOverrideInKg(NAME_None, CustomMass, true);
+			}
+
+			if (!DropImpulseDirection.IsNearlyZero())
+			{
+				FVector FinalDir;
+				LocalDir = LocalDir + (DropImpulseDirection * 1000.0f);
+
+				if (!FMath::IsNearlyZero(ImpulseRandomDispersion))
+					FinalDir += UKismetMathLibrary::RandomUnitVectorInConeInDegrees(LocalDir, ImpulseRandomDispersion);
+				FinalDir.GetSafeNormal(0.0001f);
+
+				NewActor->GetStaticMeshComponent()->AddImpulse(FinalDir * PowerImpulse);
+			}
+		}
+
+
+	}
 }

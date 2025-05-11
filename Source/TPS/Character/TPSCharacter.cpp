@@ -54,10 +54,6 @@ ATPSCharacter::ATPSCharacter()
 	// Activate ticking in order to update the cursor every frame.
 	PrimaryActorTick.bCanEverTick = true;
 	PrimaryActorTick.bStartWithTickEnabled = true;
-
-	
-	// ¬ключите использованиеTick, если нужно, чтобы обновл€ть логическую часть
-	PrimaryActorTick.bCanEverTick = true;
 	
 }
 
@@ -65,75 +61,43 @@ ATPSCharacter::ATPSCharacter()
 void ATPSCharacter::Tick(float DeltaSeconds)
 {
     Super::Tick(DeltaSeconds);
+
+	if (CurrentCursor)
 	{
-		Super::Tick(DeltaSeconds);
-
-		if (CurrentCursor)
-		{
-			APlayerController* myPC = Cast<APlayerController>(GetController());
-			if (myPC)
-			{
-				FHitResult TraceHitResult;
-				myPC->GetHitResultUnderCursor(ECC_Visibility, true, TraceHitResult);
-				FVector CursorFV = TraceHitResult.ImpactNormal;
-				FRotator CursorR = CursorFV.Rotation();
-
-				CurrentCursor->SetWorldLocation(TraceHitResult.Location);
-				CurrentCursor->SetWorldRotation(CursorR);
-			}
-		}
-
-		MovementTick(DeltaSeconds);
-	}
-
-	/*if (CursorToWorld != nullptr)
-	{
-		if (UHeadMountedDisplayFunctionLibrary::IsHeadMountedDisplayEnabled())
-		{
-			if (UWorld* World = GetWorld())
-			{
-				FHitResult HitResult;
-				FCollisionQueryParams Params(NAME_None, FCollisionQueryParams::GetUnknownStatId());
-				FVector StartLocation = TopDownCameraComponent->GetComponentLocation();
-				FVector EndLocation = TopDownCameraComponent->GetComponentRotation().Vector() * 2000.0f;
-				Params.AddIgnoredActor(this);
-				World->LineTraceSingleByChannel(HitResult, StartLocation, EndLocation, ECC_Visibility, Params);
-				FQuat SurfaceRotation = HitResult.ImpactNormal.ToOrientationRotator().Quaternion();
-				CursorToWorld->SetWorldLocationAndRotation(HitResult.Location, SurfaceRotation);
-			}
-		}
-		else if (APlayerController* PC = Cast<APlayerController>(GetController()))
+		APlayerController* myPC = Cast<APlayerController>(GetController());
+		if (myPC)
 		{
 			FHitResult TraceHitResult;
-			PC->GetHitResultUnderCursor(ECC_Visibility, true, TraceHitResult);
+			myPC->GetHitResultUnderCursor(ECC_Visibility, true, TraceHitResult);
 			FVector CursorFV = TraceHitResult.ImpactNormal;
 			FRotator CursorR = CursorFV.Rotation();
-			CursorToWorld->SetWorldLocation(TraceHitResult.Location);
-			CursorToWorld->SetWorldRotation(CursorR);
+
+			CurrentCursor->SetWorldLocation(TraceHitResult.Location);
+			CurrentCursor->SetWorldRotation(CursorR);
 		}
-	}*/
-	//MovementTick(DeltaSeconds);
-	//HandleCharacterMovementSpeedTick();
+	}
+
+	MovementTick(DeltaSeconds);
 
 }
 
-void ATPSCharacter::StartSprinting()
+void ATPSCharacter::BeginPlay()
 {
-	MovementState = EMovementState::SprintRun_State;
+	Super::BeginPlay();
+
+	if (CursorMaterial)
+	{
+		CurrentCursor = UGameplayStatics::SpawnDecalAtLocation(GetWorld(), CursorMaterial, CursorSize, FVector(0));
+	}
 }
 
-void ATPSCharacter::StopSprinting()
-{
-	MovementState = EMovementState::Walk_State;
-}
-
-void ATPSCharacter::SetupPlayerInputComponent(UInputComponent* NewInputComponent) 
+void ATPSCharacter::SetupPlayerInputComponent(UInputComponent* NewInputComponent)
 {
 
 	Super::SetupPlayerInputComponent(NewInputComponent);
 
-	NewInputComponent->BindAxis(TEXT("MoveForward"), this, & ATPSCharacter::InputAxisX);
-	NewInputComponent->BindAxis(TEXT("MoveRight"), this, & ATPSCharacter::InputAxisY);
+	NewInputComponent->BindAxis(TEXT("MoveForward"), this, &ATPSCharacter::InputAxisX);
+	NewInputComponent->BindAxis(TEXT("MoveRight"), this, &ATPSCharacter::InputAxisY);
 
 	NewInputComponent->BindAction(TEXT("MovementModeChangeSprint"), IE_Pressed, this, &ATPSCharacter::StartSprinting);
 	NewInputComponent->BindAction(TEXT("MovementModeChangeSprint"), IE_Released, this, &ATPSCharacter::StopSprinting);
@@ -148,156 +112,15 @@ void ATPSCharacter::SetupPlayerInputComponent(UInputComponent* NewInputComponent
 
 }
 
-void ATPSCharacter::HandleCharacterMovementSpeedTick()
-{
-	FVector Velocity = GetVelocity();
-	FVector NormalizedVelocity = Velocity.GetSafeNormal();
-
-	FVector ForwardVector = GetActorForwardVector();
-	float CosineAngle = FVector::DotProduct(NormalizedVelocity, ForwardVector);
-	CosineAngle = FMath::Clamp(CosineAngle, -1.0f, 1.0f);
-	float AngleInRadians = FMath::Acos(CosineAngle);
-	float AngleInDegrees = FMath::RadiansToDegrees(AngleInRadians);
-	const float AngleThreshold = 30.0f;
-
-
-	if (MovementState == EMovementState::SprintRun_State)
-	{
-		FVector ForwardVelocity = ForwardVector * Velocity.Size();
-		GetCharacterMovement()->Velocity = ForwardVelocity;
-	}
-
-
-}
-UDecalComponent * ATPSCharacter::GetCursorToWorld() 
-{
-	return nullptr;
-}
-
-void ATPSCharacter::InitWeapon(FName IdWeaponName, FAdditionalWeaponInfo WeaponAdditionalInfo, int32 NewCurrentIndexWeapon)
-{
-	if (CurrentWeapon)
-	{
-		CurrentWeapon->Destroy();
-		CurrentWeapon = nullptr;
-	}
-
-	UTPSGameInstance* myGI = Cast<UTPSGameInstance>(GetGameInstance());
-	FWeaponInfo myWeaponInfo;
-	if (myGI)
-	{
-		if (myGI->GetWeaponInfoByName(IdWeaponName, myWeaponInfo))
-		{
-			if (myWeaponInfo.WeaponClass)
-			{
-				FVector SpawnLocation = FVector(0);
-				FRotator SpawnRotation = FRotator(0);
-
-				FActorSpawnParameters SpawnParams;
-				SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-				SpawnParams.Owner = this;
-				SpawnParams.Instigator = GetInstigator();
-
-				AWeaponDefault* myWeapon = Cast<AWeaponDefault>(GetWorld()->SpawnActor(myWeaponInfo.WeaponClass, &SpawnLocation, &SpawnRotation, SpawnParams));
-				if (myWeapon)
-				{
-					FAttachmentTransformRules Rule(EAttachmentRule::SnapToTarget, false);
-					myWeapon->AttachToComponent(GetMesh(), Rule, FName("WeaponSocketRightHand"));
-					CurrentWeapon = myWeapon;
-
-					myWeapon->WeaponSetting = myWeaponInfo;
-
-					//myWeapon->AdditionalWeaponInfo.Round = myWeaponInfo.MaxRound;
-
-					myWeapon->ReloadTime = myWeaponInfo.ReloadTime;
-					myWeapon->UpdateStateWeapon(MovementState);
-
-					myWeapon->AdditionalWeaponInfo = WeaponAdditionalInfo;
-					//if(InventoryComponent)
-					CurrentIndexWeapon = NewCurrentIndexWeapon;//fix
-
-					//Not Forget remove delegate on change/drop weapon
-					myWeapon->OnWeaponReloadStart.AddDynamic(this, &ATPSCharacter::WeaponReloadStart);
-					myWeapon->OnWeaponReloadEnd.AddDynamic(this, &ATPSCharacter::WeaponReloadEnd);
-
-					myWeapon->OnWeaponFireStart.AddDynamic(this, &ATPSCharacter::WeaponFireStart);
-
-					// after switch try reload weapon if needed
-					if (CurrentWeapon->GetWeaponRound() <= 0 && CurrentWeapon->CheckCanWeaponReload())
-						CurrentWeapon->InitReload();
-
-					if (InventoryComponent)
-						InventoryComponent->OnWeaponAmmoAviable.Broadcast(myWeapon->WeaponSetting.WeaponType);
-				}
-			}
-		}
-		else
-		{
-			UE_LOG(LogTemp, Warning, TEXT("ATPSCharacter::InitWeapon - Weapon not found in table -NULL"));
-		}
-	}
-}
-
-
-AWeaponDefault * ATPSCharacter::GetCurrentWeapon()
-{
-	return CurrentWeapon;
-}
-
-void ATPSCharacter::RemoveCurrentWeapon()
-{
-}
-
-void ATPSCharacter::WeaponReloadStart(UAnimMontage* Anim)
-{
-	WeaponReloadStart_BP(Anim);
-}
-
-void ATPSCharacter::WeaponReloadEnd(bool bIsSuccess, int32 AmmoTake)
-{
-	if (InventoryComponent && CurrentWeapon)
-	{
-		InventoryComponent->AmmoSlotChangeValue(CurrentWeapon->WeaponSetting.WeaponType, AmmoTake);
-		InventoryComponent->SetAdditionalInfoWeapon(CurrentIndexWeapon, CurrentWeapon->AdditionalWeaponInfo);
-	}
-	WeaponReloadEnd_BP(bIsSuccess);
-}
-
-void ATPSCharacter::WeaponReloadStart_BP_Implementation(UAnimMontage* Anim)
-{
-	// in BP
-}
-
-void ATPSCharacter::WeaponReloadEnd_BP_Implementation(bool bIsSuccess)
-{
-	// in BP
-}
-
-void ATPSCharacter::WeaponFireStart_BP_Implementation(UAnimMontage* Anim)
-{
-	// in BP
-}
-
 void ATPSCharacter::InputAxisY(float Value)
 {
 	AxisY = Value;
-}
-
-void ATPSCharacter::BeginPlay()
-{
-	Super::BeginPlay();
-
-	if (CursorMaterial)
-	{
-		CurrentCursor = UGameplayStatics::SpawnDecalAtLocation(GetWorld(), CursorMaterial, CursorSize, FVector(0));
-	}
 }
 
 void ATPSCharacter::InputAxisX(float Value)
 {
 	AxisX = Value;
 }
-
 
 void ATPSCharacter::InputAttackPressed()
 {
@@ -307,15 +130,6 @@ void ATPSCharacter::InputAttackPressed()
 void ATPSCharacter::InputAttackReleased()
 {
 	AttackCharEvent(false);
-}
-
-void ATPSCharacter::TryReloadWeapon()
-{
-	if (CurrentWeapon && !CurrentWeapon->WeaponReloading)//fix reload
-	{
-		if (CurrentWeapon->GetWeaponRound() < CurrentWeapon->WeaponSetting.MaxRound && CurrentWeapon->CheckCanWeaponReload())
-			CurrentWeapon->InitReload();
-	}
 }
 
 void ATPSCharacter::MovementTick(float DeltaTaim)
@@ -388,8 +202,9 @@ void ATPSCharacter::AttackCharEvent(bool bIsFiring)
 		UE_LOG(LogTemp, Warning, TEXT("ATPSCharacter::AttackCharEvent - CurrentWeapon -NULL"));
 }
 
+
 void ATPSCharacter::CharacterUpdate()
-{	
+{
 	float ResSpeed = 600.0f;
 	switch (MovementState)
 	{
@@ -410,7 +225,7 @@ void ATPSCharacter::CharacterUpdate()
 		break;
 	default:
 		break;
-		
+
 	}
 	GetCharacterMovement()->MaxWalkSpeed = ResSpeed;
 
@@ -457,6 +272,124 @@ void ATPSCharacter::ChangeMovementState()
 		myWeapon->UpdateStateWeapon(MovementState);
 	}
 }
+
+
+AWeaponDefault* ATPSCharacter::GetCurrentWeapon()
+{
+	return CurrentWeapon;
+}
+
+
+
+void ATPSCharacter::InitWeapon(FName IdWeaponName, FAdditionalWeaponInfo WeaponAdditionalInfo, int32 NewCurrentIndexWeapon)
+{
+	if (CurrentWeapon)
+	{
+		CurrentWeapon->Destroy();
+		CurrentWeapon = nullptr;
+	}
+
+	UTPSGameInstance* myGI = Cast<UTPSGameInstance>(GetGameInstance());
+	FWeaponInfo myWeaponInfo;
+	if (myGI)
+	{
+		if (myGI->GetWeaponInfoByName(IdWeaponName, myWeaponInfo))
+		{
+			if (myWeaponInfo.WeaponClass)
+			{
+				FVector SpawnLocation = FVector(0);
+				FRotator SpawnRotation = FRotator(0);
+
+				FActorSpawnParameters SpawnParams;
+				SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+				SpawnParams.Owner = this;
+				SpawnParams.Instigator = GetInstigator();
+
+				AWeaponDefault* myWeapon = Cast<AWeaponDefault>(GetWorld()->SpawnActor(myWeaponInfo.WeaponClass, &SpawnLocation, &SpawnRotation, SpawnParams));
+				if (myWeapon)
+				{
+					FAttachmentTransformRules Rule(EAttachmentRule::SnapToTarget, false);
+					myWeapon->AttachToComponent(GetMesh(), Rule, FName("WeaponSocketRightHand"));
+					CurrentWeapon = myWeapon;
+
+					myWeapon->WeaponSetting = myWeaponInfo;
+
+					//myWeapon->AdditionalWeaponInfo.Round = myWeaponInfo.MaxRound;
+
+					myWeapon->ReloadTime = myWeaponInfo.ReloadTime;
+					myWeapon->UpdateStateWeapon(MovementState);
+
+					myWeapon->AdditionalWeaponInfo = WeaponAdditionalInfo;
+					//if(InventoryComponent)
+					CurrentIndexWeapon = NewCurrentIndexWeapon;//fix
+
+					//Not Forget remove delegate on change/drop weapon
+					myWeapon->OnWeaponReloadStart.AddDynamic(this, &ATPSCharacter::WeaponReloadStart);
+					myWeapon->OnWeaponReloadEnd.AddDynamic(this, &ATPSCharacter::WeaponReloadEnd);
+
+					myWeapon->OnWeaponFireStart.AddDynamic(this, &ATPSCharacter::WeaponFireStart);
+
+					// after switch try reload weapon if needed
+					if (CurrentWeapon->GetWeaponRound() <= 0 && CurrentWeapon->CheckCanWeaponReload())
+						CurrentWeapon->InitReload();
+
+					if (InventoryComponent)
+						InventoryComponent->OnWeaponAmmoAviable.Broadcast(myWeapon->WeaponSetting.WeaponType);
+				}
+			}
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("ATPSCharacter::InitWeapon - Weapon not found in table -NULL"));
+		}
+	}
+}
+
+void ATPSCharacter::TryReloadWeapon()
+{
+	if (CurrentWeapon && !CurrentWeapon->WeaponReloading)//fix reload
+	{
+		if (CurrentWeapon->GetWeaponRound() < CurrentWeapon->WeaponSetting.MaxRound && CurrentWeapon->CheckCanWeaponReload())
+			CurrentWeapon->InitReload();
+	}
+}
+
+void ATPSCharacter::RemoveCurrentWeapon()
+{
+}
+
+
+
+void ATPSCharacter::WeaponReloadStart(UAnimMontage* Anim)
+{
+	WeaponReloadStart_BP(Anim);
+}
+
+void ATPSCharacter::WeaponReloadEnd(bool bIsSuccess, int32 AmmoTake)
+{
+	if (InventoryComponent && CurrentWeapon)
+	{
+		InventoryComponent->AmmoSlotChangeValue(CurrentWeapon->WeaponSetting.WeaponType, AmmoTake);
+		InventoryComponent->SetAdditionalInfoWeapon(CurrentIndexWeapon, CurrentWeapon->AdditionalWeaponInfo);
+	}
+	WeaponReloadEnd_BP(bIsSuccess);
+}
+
+void ATPSCharacter::WeaponReloadStart_BP_Implementation(UAnimMontage* Anim)
+{
+	// in BP
+}
+
+void ATPSCharacter::WeaponReloadEnd_BP_Implementation(bool bIsSuccess)
+{
+	// in BP
+}
+
+void ATPSCharacter::WeaponFireStart_BP_Implementation(UAnimMontage* Anim)
+{
+	// in BP
+}
+
 
 void ATPSCharacter::WeaponFireStart(UAnimMontage* Anim)
 {
@@ -514,4 +447,40 @@ void ATPSCharacter::TrySwitchPreviosWeapon()
 	}
 }
 
+UDecalComponent* ATPSCharacter::GetCursorToWorld()
+{
+	return nullptr;
+}
+
+void ATPSCharacter::StartSprinting()
+{
+	MovementState = EMovementState::SprintRun_State;
+}
+
+void ATPSCharacter::StopSprinting()
+{
+	MovementState = EMovementState::Walk_State;
+}
+
+void ATPSCharacter::HandleCharacterMovementSpeedTick()
+{
+	FVector Velocity = GetVelocity();
+	FVector NormalizedVelocity = Velocity.GetSafeNormal();
+
+	FVector ForwardVector = GetActorForwardVector();
+	float CosineAngle = FVector::DotProduct(NormalizedVelocity, ForwardVector);
+	CosineAngle = FMath::Clamp(CosineAngle, -1.0f, 1.0f);
+	float AngleInRadians = FMath::Acos(CosineAngle);
+	float AngleInDegrees = FMath::RadiansToDegrees(AngleInRadians);
+	const float AngleThreshold = 30.0f;
+
+
+	if (MovementState == EMovementState::SprintRun_State)
+	{
+		FVector ForwardVelocity = ForwardVector * Velocity.Size();
+		GetCharacterMovement()->Velocity = ForwardVelocity;
+	}
+
+
+}
 

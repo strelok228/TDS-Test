@@ -53,9 +53,10 @@ public:
 	void FireTick(float DeltaTime);
 	void ReloadTick(float DeltaTime);
 	void DispersionTick(float DeltaTime);
+	void ShellDropTick(float DeltaTime);
+	void ClipDropTick(float DeltaTime);
+
 	void WeaponInit();
-	void UpdateStateWeapon(EMovementState NewMovementState);
-	void FinishReload();
 
 	UFUNCTION(BlueprintCallable)
 	void SetWeaponStateFire(bool bIsFire);
@@ -66,18 +67,21 @@ public:
 	UFUNCTION()
 	void Fire();
 
-	UFUNCTION(BlueprintCallable)
-		int32 GetWeaponRound();
-	void InitReload();
-	void CancelReload();
 
+	void UpdateStateWeapon(EMovementState NewMovementState);
 	void ChangeDispersionByShot();
 	float GetCurrentDispersion() const;
+	FVector ApplyDispersionToShoot(FVector DirectionShoot)const;
+
 	FVector GetFireEndLocation()const;
+	int8 GetNumberProjectileByShot() const;
 
-
-	//flags
-	bool BlockFire = false;
+	//Timers
+	float FireTimer = 0.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ReloadLogic")
+	float ReloadTimer = 0.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ReloadLogic Debug")	//Remove !!! Debug
+		float ReloadTime = 0.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FireLogic")
 	bool WeaponFiring = false;
@@ -85,17 +89,8 @@ public:
 	bool WeaponReloading = false;
 	bool WeaponAiming = false;
 
-	int8 GetNumberProjectileByShot() const;
-
-	FVector ShootEndLocation = FVector(0);
-	FVector ApplyDispersionToShoot(FVector DirectionShoot)const;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Debug")
-	bool ShowDebug = false;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Debug")
-	float SizeVectorToChangeShootDirectionLogic = 100.0f;
-
+	//flags
+	bool BlockFire = false;
 	//Dispersion
 	bool ShouldReduceDispersion = false;
 	float CurrentDispersion = 0.0f;
@@ -104,21 +99,39 @@ public:
 	float CurrentDispersionRecoil = 0.1f;
 	float CurrentDispersionReduction = 0.1f;
 
-
-	bool CheckCanWeaponReload();
-
 	//Timer Drop Magazine on reload
 	bool DropClipFlag = false;
 	float DropClipTimer = -1.0;
 
+	//shell flag
+	bool DropShellFlag = false;
+	float DropShellTimer = -1.0f;
+
+
+	FVector ShootEndLocation = FVector(0);
+
+	UFUNCTION(BlueprintCallable)
+	int32 GetWeaponRound();
+	UFUNCTION()
+	void InitReload();
+	void FinishReload();
+	void CancelReload();
+
+	bool CheckCanWeaponReload();
 	int8 GetAviableAmmoForReload();
+
+	UFUNCTION()
+	void InitDropMesh(UStaticMesh* DropMesh, FTransform Offset, FVector DropImpulseDirection, float LifeTimeMesh, float ImpulseRandomDispersion, float PowerImpulse, float CustomMass);
+
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Debug")
+	bool ShowDebug = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Debug")
+	float SizeVectorToChangeShootDirectionLogic = 100.0f;
+
+
 	bool CheckAmmoForWeapon(EWeaponType TypeWeapon, int8& AviableAmmForWeapon);
 
 
-	//Timers
-	float FireTimer = 0.0f;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ReloadLogic")
-		float ReloadTimer = 0.0f;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ReloadLogic Debug")	//Remove !!! Debug
-		float ReloadTime = 0.0f;
 };
