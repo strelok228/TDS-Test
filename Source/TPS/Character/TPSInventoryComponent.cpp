@@ -395,7 +395,27 @@ bool UTPSInventoryComponent::SwitchWeaponToIndex(int32 ChangeToIndex, int32 OldI
 
 FAdditionalWeaponInfo UTPSInventoryComponent::GetAdditionalInfoWeapon(int32 IndexWeapon)
 {
-	return FAdditionalWeaponInfo();
+	FAdditionalWeaponInfo result;
+	if (WeaponSlots.IsValidIndex(IndexWeapon))
+	{
+		bool bIsFind = false;
+		int8 i = 0;
+		while (i < WeaponSlots.Num() && !bIsFind)
+		{
+			if (/*WeaponSlots[i].IndexSlot*/i == IndexWeapon)
+			{
+				result = WeaponSlots[i].AdditionalInfo;
+				bIsFind = true;
+			}
+			i++;
+		}
+		if (!bIsFind)
+			UE_LOG(LogTemp, Warning, TEXT("UTPSInventoryComponent::SetAdditionalInfoWeapon - No Found Weapon with index - %d"), IndexWeapon);
+	}
+	else
+		UE_LOG(LogTemp, Warning, TEXT("UTPSInventoryComponent::SetAdditionalInfoWeapon - Not Correct index Weapon - %d"), IndexWeapon);
+
+	return result;
 }
 
 int32 UTPSInventoryComponent::GetWeaponIndexSlotByName(FName IdWeaponName)
@@ -411,6 +431,17 @@ int32 UTPSInventoryComponent::GetWeaponIndexSlotByName(FName IdWeaponName)
 			result = i/*WeaponSlots[i].IndexSlot*/;
 		}
 		i++;
+	}
+	return result;
+}
+
+FName UTPSInventoryComponent::GetWeaponNameBySlotIndex(int32 indexSlot)
+{
+	FName result;
+
+	if (WeaponSlots.IsValidIndex(indexSlot))
+	{
+		result = WeaponSlots[indexSlot].NameItem;
 	}
 	return result;
 }
@@ -437,6 +468,26 @@ void UTPSInventoryComponent::SetAdditionalInfoWeapon(int32 IndexWeapon, FAdditio
 	}
 	else
 		UE_LOG(LogTemp, Warning, TEXT("UTPSInventoryComponent::SetAdditionalInfoWeapon - Not Correct index Weapon - %d"), IndexWeapon);
+}
+
+void UTPSInventoryComponent::AmmoSlotChangeValue(EWeaponType TypeWeapon, int32 CoutChangeAmmo)
+{
+	bool bIsFind = false;
+	int8 i = 0;
+	while (i < AmmoSlots.Num() && !bIsFind)
+	{
+		if (AmmoSlots[i].WeaponType == TypeWeapon)
+		{
+			AmmoSlots[i].Cout += CoutChangeAmmo;
+			if (AmmoSlots[i].Cout > AmmoSlots[i].MaxCout)
+				AmmoSlots[i].Cout = AmmoSlots[i].MaxCout;
+
+			OnAmmoChange.Broadcast(AmmoSlots[i].WeaponType, AmmoSlots[i].Cout);
+
+			bIsFind = true;
+		}
+		i++;
+	}
 }
 
 bool UTPSInventoryComponent::CheckAmmoForWeapon(EWeaponType TypeWeapon, int8& AviableAmmForWeapon)
@@ -466,23 +517,84 @@ bool UTPSInventoryComponent::CheckAmmoForWeapon(EWeaponType TypeWeapon, int8& Av
 	return false;
 }
 
-void UTPSInventoryComponent::AmmoSlotChangeValue(EWeaponType TypeWeapon, int32 CoutChangeAmmo)
+bool UTPSInventoryComponent::CheckCanTakeAmmo(EWeaponType AmmoType)
 {
-	bool bIsFind = false;
+	bool result = false;
 	int8 i = 0;
-	while (i < AmmoSlots.Num() && !bIsFind)
+	while (i < AmmoSlots.Num() && !result)
 	{
-		if (AmmoSlots[i].WeaponType == TypeWeapon)
+		if (AmmoSlots[i].WeaponType == AmmoType && AmmoSlots[i].Cout < AmmoSlots[i].MaxCout)
+			result = true;
+		i++;
+	}
+	return result;
+}
+
+bool UTPSInventoryComponent::CheckCanTakeWeapon(int32& FreeSlot)
+{
+	bool bIsFreeSlot = false;
+	int8 i = 0;
+	while (i < WeaponSlots.Num() && !bIsFreeSlot)
+	{
+		if (WeaponSlots[i].NameItem.IsNone())
 		{
-			AmmoSlots[i].Cout += CoutChangeAmmo;
-			if (AmmoSlots[i].Cout > AmmoSlots[i].MaxCout)
-				AmmoSlots[i].Cout = AmmoSlots[i].MaxCout;
-
-			OnAmmoChange.Broadcast(AmmoSlots[i].WeaponType, AmmoSlots[i].Cout);
-
-			bIsFind = true;
+			bIsFreeSlot = true;
+			FreeSlot = i;
 		}
 		i++;
 	}
+	return bIsFreeSlot;
 }
+
+bool UTPSInventoryComponent::SwitchWeaponToInventory(FWeaponSlot NewWeapon, int32 IndexSlot, int32 CurrentIndexWeaponChar, FDropItem& DropItemInfo)
+{
+	bool result = false;
+
+	if (WeaponSlots.IsValidIndex(IndexSlot) && GetDropItemInfoFromInventory(IndexSlot, DropItemInfo))
+	{
+		WeaponSlots[IndexSlot] = NewWeapon;
+
+		SwitchWeaponToIndex(CurrentIndexWeaponChar, -1, NewWeapon.AdditionalInfo, true);
+
+		OnUpdateWeaponSlots.Broadcast(IndexSlot, NewWeapon);
+		result = true;
+	}
+	return result;
+}
+
+bool UTPSInventoryComponent::TryGetWeaponToInventory(FWeaponSlot NewWeapon)
+{
+	int32 indexSlot = -1;
+	if (CheckCanTakeWeapon(indexSlot))
+	{
+		if (WeaponSlots.IsValidIndex(indexSlot))
+		{
+			WeaponSlots[indexSlot] = NewWeapon;
+
+			OnUpdateWeaponSlots.Broadcast(indexSlot, NewWeapon);
+			return true;
+		}
+	}
+	return false;
+}
+
+bool UTPSInventoryComponent::GetDropItemInfoFromInventory(int32 IndexSlot, FDropItem& DropItemInfo)
+{
+	bool result = false;
+
+	FName DropItemName = GetWeaponNameBySlotIndex(IndexSlot);
+
+	UTPSGameInstance* myGI = Cast<UTPSGameInstance>(GetWorld()->GetGameInstance());
+	if (myGI)
+	{
+		result = myGI->GetDropItemInfoByWeaponName(DropItemName, DropItemInfo);
+		if (WeaponSlots.IsValidIndex(IndexSlot))
+		{
+			DropItemInfo.WeaponInfo.AdditionalInfo = WeaponSlots[IndexSlot].AdditionalInfo;
+		}
+	}
+
+	return result;
+}
+
 

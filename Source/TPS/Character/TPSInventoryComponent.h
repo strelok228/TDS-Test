@@ -51,16 +51,31 @@ public:
 	int32 MaxSlotsWeapon = 0;
 		
 	bool SwitchWeaponToIndex(int32 ChangeToIndex, int32 OldIndex, FAdditionalWeaponInfo OldInfo, bool bIsForward);
+
 	FAdditionalWeaponInfo GetAdditionalInfoWeapon(int32 IndexWeapon);
 	int32 GetWeaponIndexSlotByName(FName IdWeaponName);
+	FName GetWeaponNameBySlotIndex(int32 indexSlot);
 	void SetAdditionalInfoWeapon(int32 IndexWeapon, FAdditionalWeaponInfo NewInfo);
-
-	bool CheckAmmoForWeapon(EWeaponType TypeWeapon, int8& AviableAmmForWeapon);
 
 	UFUNCTION(BlueprintCallable)
 	void AmmoSlotChangeValue(EWeaponType TypeWeapon, int32 CoutChangeAmmo);
 
+	bool CheckAmmoForWeapon(EWeaponType TypeWeapon, int8& AviableAmmForWeapon);
+
 	int32 AviableAmmoForWeapon = 0;
+
+	//Interface PickUp Actors
+	UFUNCTION(BlueprintCallable, Category = "Interface")
+	bool CheckCanTakeAmmo(EWeaponType AmmoType);
+	UFUNCTION(BlueprintCallable, Category = "Interface")
+	bool CheckCanTakeWeapon(int32& FreeSlot);
+	UFUNCTION(BlueprintCallable, Category = "Interface")
+	bool SwitchWeaponToInventory(FWeaponSlot NewWeapon, int32 IndexSlot, int32 CurrentIndexWeaponChar, FDropItem& DropItemInfo);
+	UFUNCTION(BlueprintCallable, Category = "Interface")
+	bool TryGetWeaponToInventory(FWeaponSlot NewWeapon);
+
+	UFUNCTION(BlueprintCallable, Category = "Interface")
+	bool GetDropItemInfoFromInventory(int32 IndexSlot, FDropItem& DropItemInfo);
 
 
 };

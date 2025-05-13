@@ -430,8 +430,6 @@ void AWeaponDefault::FinishReload()
 	OnWeaponReloadEnd.Broadcast(true, -AmmoNeedTakeFromInv);
 }
 
-
-
 void AWeaponDefault::CancelReload()
 {
 	WeaponReloading = false;
@@ -441,8 +439,6 @@ void AWeaponDefault::CancelReload()
 	OnWeaponReloadEnd.Broadcast(false, 0);
 	DropClipFlag = false;
 }
-		
-
 
 bool AWeaponDefault::CheckCanWeaponReload()
 {
