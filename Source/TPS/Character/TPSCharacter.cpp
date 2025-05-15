@@ -45,6 +45,7 @@ ATPSCharacter::ATPSCharacter()
 	TopDownCameraComponent->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 
 	InventoryComponent = CreateDefaultSubobject<UTPSInventoryComponent>(TEXT("InventoryComponent"));
+	CharHealthComponent = CreateDefaultSubobject<UTPSCharacterHealthComponent>(TEXT("HealthComponent"));
 
 	if (InventoryComponent)
 	{
@@ -445,6 +446,17 @@ void ATPSCharacter::TrySwitchPreviosWeapon()
 			}
 		}
 	}
+}
+
+float ATPSCharacter::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser)
+{
+	float ActualDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+	if (bIsAlive)
+	{
+		CharHealthComponent->ChangeHealthValue(-DamageAmount);
+	}
+
+	return ActualDamage;
 }
 
 UDecalComponent* ATPSCharacter::GetCursorToWorld()

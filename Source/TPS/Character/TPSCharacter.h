@@ -7,6 +7,7 @@
 #include "FuncLibrary/Types.h"
 #include "WeaponDefault.h"
 #include "Character/TPSInventoryComponent.h"
+#include "Character/TPSCharacterHealthComponent.h"
 
 #include "TPSCharacter.generated.h"
 
@@ -38,8 +39,10 @@ public:
     }
     /** Returns CursorToWorld subobject **/
     // FORCEINLINE class UDecalComponent* GetCursorToWorld() { return CursorToWorld; }
-    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Inventory", meta = (AllowPrivateAccess = "true"))
     class UTPSInventoryComponent* InventoryComponent;
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Health", meta = (AllowPrivateAccess = "true"))
+    class UTPSCharacterHealthComponent* CharHealthComponent;
 
 private:
     /** Top down camera */
@@ -73,6 +76,8 @@ public:
     bool WalkEnabled = false;
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
     bool AimEnabled = false;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
+    bool bIsAlive = true;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Demo")
     TSubclassOf<AWeaponDefault> InitWeaponClass = nullptr;
@@ -154,6 +159,9 @@ public:
 
     UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
     int32 CurrentIndexWeapon = 0;
+
+
+    virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 
 
 };

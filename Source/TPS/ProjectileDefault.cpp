@@ -60,14 +60,11 @@ void AProjectileDefault::Tick(float DeltaTime)
 
 void AProjectileDefault::InitProjectile(FProjectileInfo InitParam)
 {
-	
 	BulletProjectileMovement->InitialSpeed = InitParam.ProjectileInitSpeed;
 	BulletProjectileMovement->MaxSpeed = InitParam.ProjectileInitSpeed;
 	this->SetLifeSpan(InitParam.ProjectileLifeTime);
 
 	ProjectileSetting = InitParam;
-	
-
 }
 
 void AProjectileDefault::BulletCollisionSphereHit(UPrimitiveComponent * HitComp, AActor * OtherActor, UPrimitiveComponent * OtherComp, FVector NormalImpulse, const FHitResult & Hit)
@@ -100,6 +97,7 @@ void AProjectileDefault::BulletCollisionSphereHit(UPrimitiveComponent * HitComp,
 		}
 
 	}
+	UGameplayStatics::ApplyPointDamage(OtherActor, ProjectileSetting.ProjectileDamage, Hit.TraceStart, Hit, GetInstigatorController(), this, NULL);
 	UGameplayStatics::ApplyDamage(OtherActor, ProjectileSetting.ProjectileDamage, GetInstigatorController(), this, NULL);
 	ImpactProjectile();
 	//UGameplayStatics::ApplyRadialDamageWithFalloff()
