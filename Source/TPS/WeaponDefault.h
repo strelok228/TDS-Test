@@ -131,7 +131,5 @@ public:
 	float SizeVectorToChangeShootDirectionLogic = 100.0f;
 
 
-	bool CheckAmmoForWeapon(EWeaponType TypeWeapon, int8& AviableAmmForWeapon);
-
 
 };

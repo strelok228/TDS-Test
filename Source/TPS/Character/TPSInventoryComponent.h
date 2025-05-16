@@ -62,7 +62,7 @@ public:
 
 	bool CheckAmmoForWeapon(EWeaponType TypeWeapon, int8& AviableAmmForWeapon);
 
-	int32 AviableAmmoForWeapon = 0;
+	int AviableAmmoForWeapon = 0;
 
 	//Interface PickUp Actors
 	UFUNCTION(BlueprintCallable, Category = "Interface")
