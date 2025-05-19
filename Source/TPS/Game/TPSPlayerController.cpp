@@ -24,3 +24,7 @@ void ATPSPlayerController::SetupInputComponent()
 	Super::SetupInputComponent();
 
 }
+void ATPSPlayerController::OnUnPossess()
+{
+	Super::OnUnPossess();
+}

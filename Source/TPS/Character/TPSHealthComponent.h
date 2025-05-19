@@ -10,7 +10,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnHealthChange, float, Health, flo
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDead);
 
 
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class TPS_API UTPSHealthComponent : public UActorComponent
 {
 	GENERATED_BODY()
@@ -27,7 +27,7 @@ public:
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
-
+ 
 	float Health = 100.0f;
 
 public:	

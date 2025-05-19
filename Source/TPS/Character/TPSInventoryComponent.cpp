@@ -490,7 +490,7 @@ void UTPSInventoryComponent::AmmoSlotChangeValue(EWeaponType TypeWeapon, int32 C
 	}
 }
 
-bool UTPSInventoryComponent::CheckAmmoForWeapon(EWeaponType TypeWeapon, int8& AviableAmmForWeapon)
+bool UTPSInventoryComponent::CheckAmmoForWeapon(EWeaponType TypeWeapon, int8 &AviableAmmForWeapon)
 {
 	AviableAmmoForWeapon = 0;
 	bool bIsFind = false;

@@ -22,6 +22,8 @@ protected:
 public:
     ATPSCharacter();
 
+    FTimerHandle TimerHandle_RagDollTimer;
+
     // Called every frame.
     virtual void Tick(float DeltaSeconds) override;
 
@@ -79,17 +81,13 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
     bool bIsAlive = true;
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Demo")
-    TSubclassOf<AWeaponDefault> InitWeaponClass = nullptr;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
+    TArray<UAnimMontage*> DeadsAnim;
 
     // Weapon
     AWeaponDefault* CurrentWeapon = nullptr;
 
     UDecalComponent* CurrentCursor = nullptr;
-
-    // for demo
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Demo")
-    FName InitWeaponName;
 
     float AxisX = 0.0f;
     float AxisY = 0.0f;
@@ -161,6 +159,10 @@ public:
     int32 CurrentIndexWeapon = 0;
 
 
+    //
+    UFUNCTION()
+    void CharDead();
+    void EnableRagdoll();
     virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 
 
