@@ -486,16 +486,6 @@ void ATPSCharacter::EnableRagdoll()
 	}
 }
 
-float ATPSCharacter::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser)
-{
-	float ActualDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
-	if (bIsAlive)
-	{
-		CharHealthComponent->ChangeHealthValue(-DamageAmount);
-	}
-
-	return ActualDamage;
-}
 
 UDecalComponent* ATPSCharacter::GetCursorToWorld()
 {
@@ -532,5 +522,15 @@ void ATPSCharacter::HandleCharacterMovementSpeedTick()
 	}
 
 
+}
+float ATPSCharacter::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser)
+{
+	float ActualDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+	if (bIsAlive)
+	{
+		CharHealthComponent->ChangeHealthValue(-DamageAmount);
+	}
+
+	return ActualDamage;
 }
 
