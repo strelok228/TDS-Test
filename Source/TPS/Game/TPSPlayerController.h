@@ -22,7 +22,7 @@ protected:
 	virtual void PlayerTick(float DeltaTime) override;
 	virtual void SetupInputComponent() override;
 
-	virtual void OnUnPossess()override;
+	virtual void OnUnPossess() override;
 };
 
 
