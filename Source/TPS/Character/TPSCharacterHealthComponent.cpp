@@ -11,7 +11,7 @@ void UTPSCharacterHealthComponent::ChangeHealthValue(float ChangeValue)
 	if (Shield > 0.0f && ChangeValue < 0.0f)
 	{
 		ChangeShieldValue(ChangeValue);
-		+
+
 		if (Shield < 0.0f)
 		{
 			//FX
