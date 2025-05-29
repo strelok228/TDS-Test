@@ -59,6 +59,7 @@ private:
     // UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
     // class UDecalComponent* CursorToWorld;
 
+
 public:
     // Cursor
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Cursor")
@@ -121,7 +122,7 @@ public:
     void InitWeapon(FName IdWeaponName, FAdditionalWeaponInfo WeaponAdditionalInfo, int32 NewCurrentIndexWeapon);
     
     UFUNCTION(BlueprintCallable) // VisualOnly
-        void RemoveCurrentWeapon();
+    void RemoveCurrentWeapon();
 
     UFUNCTION(BlueprintCallable)
     void TryReloadWeapon();
@@ -160,10 +161,10 @@ public:
 
 
     //
-    UFUNCTION()
+    UFUNCTION(BlueprintCallable)
     void CharDead();
     void EnableRagdoll();
-    virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
+    virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;;
 
 
 };

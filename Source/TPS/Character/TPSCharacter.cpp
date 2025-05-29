@@ -60,6 +60,7 @@ ATPSCharacter::ATPSCharacter()
 	// Activate ticking in order to update the cursor every frame.
 	PrimaryActorTick.bCanEverTick = true;
 	PrimaryActorTick.bStartWithTickEnabled = true;
+
 	
 }
 
@@ -459,7 +460,7 @@ void ATPSCharacter::TrySwitchPreviosWeapon()
 
 UDecalComponent* ATPSCharacter::GetCursorToWorld()
 {
-	return nullptr;
+	return CurrentCursor;
 }
 
 void ATPSCharacter::StartSprinting()
@@ -494,6 +495,7 @@ void ATPSCharacter::HandleCharacterMovementSpeedTick()
 
 }
 
+
 void ATPSCharacter::CharDead()
 {
 	float TimeAnim = 0.0f;
@@ -502,6 +504,8 @@ void ATPSCharacter::CharDead()
 	{
 		TimeAnim = DeadsAnim[rnd]->GetPlayLength();
 		GetMesh()->GetAnimInstance()->Montage_Play(DeadsAnim[rnd]);
+
+		return;
 	}
 
 	bIsAlive = false;
@@ -510,12 +514,19 @@ void ATPSCharacter::CharDead()
 
 	//Timer rag doll
 	GetWorldTimerManager().SetTimer(TimerHandle_RagDollTimer, this, &ATPSCharacter::EnableRagdoll, TimeAnim, false);
+
+	GetCursorToWorld()->SetVisibility(false);
+
+
 }
+
 
 void ATPSCharacter::EnableRagdoll()
 {
 	if (GetMesh())
 	{
+
+		// ¬ключить физику и коллизии
 		GetMesh()->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
 		GetMesh()->SetSimulatePhysics(true);
 	}
@@ -531,4 +542,5 @@ float ATPSCharacter::TakeDamage(float DamageAmount, struct FDamageEvent const& D
 
 	return ActualDamage;
 }
+
 
