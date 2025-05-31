@@ -8,6 +8,7 @@
 #include "WeaponDefault.h"
 #include "Character/TPSInventoryComponent.h"
 #include "Character/TPSCharacterHealthComponent.h"
+#include "TPSHealthComponent.h"
 
 #include "TPSCharacter.generated.h"
 
@@ -45,6 +46,10 @@ public:
     class UTPSInventoryComponent* InventoryComponent;
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Health", meta = (AllowPrivateAccess = "true"))
     class UTPSCharacterHealthComponent* CharHealthComponent;
+
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Status")
+    bool bIsDead;
+
 
 private:
     /** Top down camera */
@@ -102,7 +107,7 @@ public:
     void InputAttackPressed();
     UFUNCTION()
     void InputAttackReleased();
-   
+
     // Tick Func
     UFUNCTION()
     void MovementTick(float DeltaTaim);
@@ -159,7 +164,7 @@ public:
     UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
     int32 CurrentIndexWeapon = 0;
 
-
+    void Die(bool bIsDead);
     //
     UFUNCTION(BlueprintCallable)
     void CharDead();

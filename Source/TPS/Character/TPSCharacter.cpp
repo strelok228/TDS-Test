@@ -61,7 +61,6 @@ ATPSCharacter::ATPSCharacter()
 	PrimaryActorTick.bCanEverTick = true;
 	PrimaryActorTick.bStartWithTickEnabled = true;
 
-	
 }
 
 
@@ -69,18 +68,22 @@ void ATPSCharacter::Tick(float DeltaSeconds)
 {
     Super::Tick(DeltaSeconds);
 
-	if (CurrentCursor)
+	if(bIsAlive)
 	{
-		APlayerController* myPC = Cast<APlayerController>(GetController());
-		if (myPC)
-		{
-			FHitResult TraceHitResult;
-			myPC->GetHitResultUnderCursor(ECC_Visibility, true, TraceHitResult);
-			FVector CursorFV = TraceHitResult.ImpactNormal;
-			FRotator CursorR = CursorFV.Rotation();
 
-			CurrentCursor->SetWorldLocation(TraceHitResult.Location);
-			CurrentCursor->SetWorldRotation(CursorR);
+		if (CurrentCursor)
+		{
+			APlayerController* myPC = Cast<APlayerController>(GetController());
+			if (myPC)
+			{
+				FHitResult TraceHitResult;
+				myPC->GetHitResultUnderCursor(ECC_Visibility, true, TraceHitResult);
+				FVector CursorFV = TraceHitResult.ImpactNormal;
+				FRotator CursorR = CursorFV.Rotation();
+
+				CurrentCursor->SetWorldLocation(TraceHitResult.Location);
+				CurrentCursor->SetWorldRotation(CursorR);
+			}
 		}
 	}
 
@@ -91,6 +94,7 @@ void ATPSCharacter::Tick(float DeltaSeconds)
 void ATPSCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
 
 	if (CursorMaterial)
 	{
@@ -202,15 +206,19 @@ void ATPSCharacter::MovementTick(float DeltaTaim)
 
 void ATPSCharacter::AttackCharEvent(bool bIsFiring)
 {
-	AWeaponDefault* myWeapon = nullptr;
-	myWeapon = GetCurrentWeapon();
-	if (myWeapon)
+	if(bIsAlive)
 	{
-		//ToDo Check melee or range
-		myWeapon->SetWeaponStateFire(bIsFiring);
+		AWeaponDefault* myWeapon = nullptr;
+		myWeapon = GetCurrentWeapon();
+		if (myWeapon)
+		{
+			//ToDo Check melee or range
+			myWeapon->SetWeaponStateFire(bIsFiring);
+		}
+		else
+			UE_LOG(LogTemp, Warning, TEXT("ATPSCharacter::AttackCharEvent - CurrentWeapon -NULL"));
 	}
-	else
-		UE_LOG(LogTemp, Warning, TEXT("ATPSCharacter::AttackCharEvent - CurrentWeapon -NULL"));
+
 }
 
 
@@ -357,12 +365,16 @@ void ATPSCharacter::InitWeapon(FName IdWeaponName, FAdditionalWeaponInfo WeaponA
 }
 
 void ATPSCharacter::TryReloadWeapon()
-{
-	if (CurrentWeapon && !CurrentWeapon->WeaponReloading)//fix reload
+{ 
+	if(bIsAlive)
 	{
-		if (CurrentWeapon->GetWeaponRound() < CurrentWeapon->WeaponSetting.MaxRound && CurrentWeapon->CheckCanWeaponReload())
-			CurrentWeapon->InitReload();
+		if (CurrentWeapon && !CurrentWeapon->WeaponReloading)//fix reload
+		{
+			if (CurrentWeapon->GetWeaponRound() < CurrentWeapon->WeaponSetting.MaxRound && CurrentWeapon->CheckCanWeaponReload())
+				CurrentWeapon->InitReload();
+		}
 	}
+
 }
 
 void ATPSCharacter::RemoveCurrentWeapon()
@@ -495,6 +507,16 @@ void ATPSCharacter::HandleCharacterMovementSpeedTick()
 
 }
 
+void ATPSCharacter::Die(bool bIsDead)
+{
+	if (!bIsDead)
+	{
+		bIsDead = true;
+
+		// Вызываем делегат
+		FOnDead OnDead;
+	}
+}
 
 void ATPSCharacter::CharDead()
 {
@@ -505,14 +527,13 @@ void ATPSCharacter::CharDead()
 		TimeAnim = DeadsAnim[rnd]->GetPlayLength();
 		GetMesh()->GetAnimInstance()->Montage_Play(DeadsAnim[rnd]);
 
-		return;
 	}
 
 	bIsAlive = false;
 
 	UnPossessed();
 
-	//Timer rag doll
+	//Timer rag dol
 	GetWorldTimerManager().SetTimer(TimerHandle_RagDollTimer, this, &ATPSCharacter::EnableRagdoll, TimeAnim, false);
 
 	GetCursorToWorld()->SetVisibility(false);
