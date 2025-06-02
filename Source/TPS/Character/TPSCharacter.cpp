@@ -50,6 +50,7 @@ ATPSCharacter::ATPSCharacter()
 	if (CharHealthComponent)
 	{
 		CharHealthComponent->OnDead.AddDynamic(this, &ATPSCharacter::CharDead);
+		CharHealthComponent->OnDead.AddDynamic(this, &ATPSCharacter::Die);
 	}
 
 	if (InventoryComponent)
@@ -507,17 +508,6 @@ void ATPSCharacter::HandleCharacterMovementSpeedTick()
 
 }
 
-void ATPSCharacter::Die(bool bIsDead)
-{
-	if (!bIsDead)
-	{
-		bIsDead = true;
-
-		// Вызываем делегат
-		FOnDead OnDead;
-	}
-}
-
 void ATPSCharacter::CharDead()
 {
 	float TimeAnim = 0.0f;
@@ -551,6 +541,16 @@ void ATPSCharacter::EnableRagdoll()
 		GetMesh()->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
 		GetMesh()->SetSimulatePhysics(true);
 	}
+}
+
+void ATPSCharacter::Die(bool bIsDead)
+{
+	if (bIsDead)
+	{
+		bIsDead = true;
+
+	}
+	
 }
 
 float ATPSCharacter::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser)

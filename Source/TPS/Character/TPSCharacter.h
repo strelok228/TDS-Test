@@ -48,7 +48,7 @@ public:
     class UTPSCharacterHealthComponent* CharHealthComponent;
 
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Status")
-    bool bIsDead;
+    bool bIsDead = false;
 
 
 private:
@@ -164,6 +164,7 @@ public:
     UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
     int32 CurrentIndexWeapon = 0;
 
+    UFUNCTION(BlueprintCallable)
     void Die(bool bIsDead);
     //
     UFUNCTION(BlueprintCallable)
