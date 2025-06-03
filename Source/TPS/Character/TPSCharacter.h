@@ -164,8 +164,8 @@ public:
     UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
     int32 CurrentIndexWeapon = 0;
 
-    UFUNCTION(BlueprintCallable)
     void Die(bool bIsDead);
+
     //
     UFUNCTION(BlueprintCallable)
     void CharDead();
