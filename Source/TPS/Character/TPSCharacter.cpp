@@ -49,7 +49,6 @@ ATPSCharacter::ATPSCharacter()
 
 	if (CharHealthComponent)
 	{
-		CharHealthComponent->OnDead.AddDynamic(this, &ATPSCharacter::CharDead);
 		CharHealthComponent->OnDead.AddDynamic(this, &ATPSCharacter::Die);
 	}
 
@@ -548,6 +547,7 @@ void ATPSCharacter::Die(bool bIsDead)
 	if (bIsDead)
 	{
 		bIsDead = true;
+
 
 	}
 	

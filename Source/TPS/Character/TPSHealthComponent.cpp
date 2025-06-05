@@ -2,6 +2,7 @@
 
 
 #include "Character/TPSHealthComponent.h"
+#include "Character/TPSCharacter.h"
 
 // Sets default values for this component's properties
 UTPSHealthComponent::UTPSHealthComponent()
@@ -56,7 +57,7 @@ void UTPSHealthComponent::ChangeHealthValue(float ChangeValue)
 	{
 		if (Health < 0.0f)
 		{
-			OnDead.Broadcast();
+			OnDead.Broadcast(true);
 		}
 	}
 

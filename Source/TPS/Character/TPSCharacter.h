@@ -163,7 +163,7 @@ public:
 
     UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
     int32 CurrentIndexWeapon = 0;
-
+    
     void Die(bool bIsDead);
 
     //
