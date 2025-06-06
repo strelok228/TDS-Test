@@ -61,6 +61,8 @@ ATPSCharacter::ATPSCharacter()
 	PrimaryActorTick.bCanEverTick = true;
 	PrimaryActorTick.bStartWithTickEnabled = true;
 
+	bIsDead = false;
+
 }
 
 
@@ -542,15 +544,15 @@ void ATPSCharacter::EnableRagdoll()
 	}
 }
 
-void ATPSCharacter::Die(bool bIsDead)
+void ATPSCharacter::Die(bool bIsDeadParam)
 {
-	if (bIsDead)
+	bIsDead = bIsDeadParam;
+
+	if (bIsDeadParam)
 	{
-		bIsDead = true;
-
-
+		bIsDeadParam = true;
+		return;
 	}
-	
 }
 
 float ATPSCharacter::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser)

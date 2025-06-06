@@ -62,5 +62,7 @@ void UTPSHealthComponent::ChangeHealthValue(float ChangeValue)
 	}
 
 	OnHealthChange.Broadcast(Health, ChangeValue);
+
+	return;
 }
 
