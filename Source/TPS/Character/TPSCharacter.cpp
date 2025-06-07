@@ -554,9 +554,8 @@ void ATPSCharacter::Die(bool bIsDeadParam)
 		{
 			bIsDeadParam = true;
 		}
+		CharDead();
 	}
-
-
 
 }
 
