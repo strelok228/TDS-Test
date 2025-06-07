@@ -23,6 +23,8 @@ public:
 	FOnHealthChange OnHealthChange;
 	UPROPERTY(BlueprintAssignable, EditAnywhere, BlueprintReadWrite, Category = "Health")
 	FOnDead OnDead;
+	UPROPERTY(BlueprintAssignable, EditAnywhere, BlueprintReadWrite, Category = "Health")
+	FOnDead OnDead2;
 
 protected:
 	// Called when the game starts

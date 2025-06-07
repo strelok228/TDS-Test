@@ -49,7 +49,7 @@ ATPSCharacter::ATPSCharacter()
 
 	if (CharHealthComponent)
 	{
-		CharHealthComponent->OnDead.AddDynamic(this, &ATPSCharacter::Die);
+		CharHealthComponent->OnDead2.AddDynamic(this, &ATPSCharacter::Die);
 	}
 
 	if (InventoryComponent)
@@ -546,13 +546,18 @@ void ATPSCharacter::EnableRagdoll()
 
 void ATPSCharacter::Die(bool bIsDeadParam)
 {
-	bIsDead = bIsDeadParam;
-
-	if (bIsDeadParam)
+	if (bIsAlive)
 	{
-		bIsDeadParam = true;
-		return;
+		bIsDead = bIsDeadParam;
+
+		if (bIsDeadParam)
+		{
+			bIsDeadParam = true;
+		}
 	}
+
+
+
 }
 
 float ATPSCharacter::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser)
