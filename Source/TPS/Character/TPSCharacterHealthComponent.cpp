@@ -2,25 +2,35 @@
 
 
 #include "Character/TPSCharacterHealthComponent.h"
+#include "TPSCharacter.h"
 
 
 void UTPSCharacterHealthComponent::ChangeHealthValue(float ChangeValue)
 {
-	float CurrentDamage = ChangeValue * CoefDamage;
-
-	if (Shield > 0.0f && ChangeValue < 0.0f)
+	ATPSCharacter* Character = Cast<ATPSCharacter>(GetOwner());
+	if (Character)
 	{
-		ChangeShieldValue(ChangeValue);
-
-		if (Shield < 0.0f)
+		if (!Character->bIsDead == true)
 		{
-			//FX
-			//UE_LOG(LogTemp, Warning, TEXT("UTPSCharacterHealthComponent::ChangeHealthValue - Sheild < 0"));
+		
+			float CurrentDamage = ChangeValue * CoefDamage;
+
+			if (Shield > 0.0f && ChangeValue < 0.0f)
+			{
+				ChangeShieldValue(ChangeValue);
+
+				if (Shield < 0.0f)
+				{
+					//FX
+					//UE_LOG(LogTemp, Warning, TEXT("UTPSCharacterHealthComponent::ChangeHealthValue - Sheild < 0"));
+				}
+			}
+			else
+			{
+				Super::ChangeHealthValue(ChangeValue);
+			}
 		}
-	}
-	else
-	{
-		Super::ChangeHealthValue(ChangeValue);
+		return;
 	}
 }
 
@@ -31,26 +41,35 @@ float UTPSCharacterHealthComponent::GetCurrentShield()
 
 void UTPSCharacterHealthComponent::ChangeShieldValue(float ChangeValue)
 {
-	Shield += ChangeValue;
-
-	if (Shield > 100.0f)
+	ATPSCharacter* Character = Cast<ATPSCharacter>(GetOwner());
+	if (Character)
 	{
-		Shield = 100.0f;
-	}
-	else
-	{
-		if (Shield < 0.0f)
-			Shield = 0.0f;
+		if(!Character->bIsDead == true)
+		{
+			Shield += ChangeValue;
+
+			if (Shield > 100.0f)
+			{
+				Shield = 100.0f;
+			}
+			else
+			{
+				if (Shield < 0.0f)
+					Shield = 0.0f;
+			}
+
+			if (GetWorld())
+			{
+				GetWorld()->GetTimerManager().SetTimer(TimerHandle_CollDownShieldTimer, this, &UTPSCharacterHealthComponent::CoolDownShieldEnd, CoolDownShieldRecoverTime, false);
+
+				GetWorld()->GetTimerManager().ClearTimer(TimerHandle_ShieldRecoveryRateTimer);
+			}
+
+			OnShieldChange.Broadcast(Shield, ChangeValue);
+		}
+		return;
 	}
 
-	if (GetWorld())
-	{
-		GetWorld()->GetTimerManager().SetTimer(TimerHandle_CollDownShieldTimer, this, &UTPSCharacterHealthComponent::CoolDownShieldEnd, CoolDownShieldRecoverTime, false);
-
-		GetWorld()->GetTimerManager().ClearTimer(TimerHandle_ShieldRecoveryRateTimer);
-	}
-
-	OnShieldChange.Broadcast(Shield, ChangeValue);
 }
 
 void UTPSCharacterHealthComponent::CoolDownShieldEnd()
@@ -63,21 +82,29 @@ void UTPSCharacterHealthComponent::CoolDownShieldEnd()
 
 void UTPSCharacterHealthComponent::RecoveryShield()
 {
-	float tmp = Shield;
-	tmp = tmp + ShieldRecoverValue;
-	if (tmp > 100.0f)
+	ATPSCharacter* Character = Cast<ATPSCharacter>(GetOwner());
+	if (Character)
 	{
-		Shield = 100.0f;
-		if (GetWorld())
+		if (!Character->bIsDead == true)
 		{
-			GetWorld()->GetTimerManager().ClearTimer(TimerHandle_ShieldRecoveryRateTimer);
-		}
-	}
-	else
-	{
-		Shield = tmp;
-	}
+			float tmp = Shield;
+			tmp = tmp + ShieldRecoverValue;
+			if (tmp > 100.0f)
+			{
+				Shield = 100.0f;
+				if (GetWorld())
+				{
+					GetWorld()->GetTimerManager().ClearTimer(TimerHandle_ShieldRecoveryRateTimer);
+				}
+			}
+			else
+			{
+				Shield = tmp;
+			}
 
-	OnShieldChange.Broadcast(Shield, ShieldRecoverValue);
+			OnShieldChange.Broadcast(Shield, ShieldRecoverValue);
+		}
+		return;
+	}
 }
 

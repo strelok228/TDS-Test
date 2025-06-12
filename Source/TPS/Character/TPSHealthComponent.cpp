@@ -45,24 +45,30 @@ void UTPSHealthComponent::SetCurrentHealth(float NewHealth)
 
 void UTPSHealthComponent::ChangeHealthValue(float ChangeValue)
 {
-	ChangeValue = ChangeValue * CoefDamage;
-
-	Health += ChangeValue;
-
-	if (Health > 100.0f)
+	ATPSCharacter* Character = Cast<ATPSCharacter>(GetOwner());
+	if (Character)
 	{
-		Health = 100.0f;
-	}
-	else
-	{
-		if (Health < 0.0f)
+		if (!Character->bIsDead == true)
 		{
-			OnDead2.Broadcast(true);
+			ChangeValue = ChangeValue * CoefDamage;
+
+			Health += ChangeValue;
+
+			if (Health > 100.0f)
+			{
+				Health = 100.0f;
+			}
+			else
+			{
+				if (Health < 0.0f)
+				{
+					OnDead2.Broadcast(true);
+				}
+			}
+
+			OnHealthChange.Broadcast(Health, ChangeValue);
 		}
+		return;
 	}
-
-	OnHealthChange.Broadcast(Health, ChangeValue);
-
-	return;
 }
 

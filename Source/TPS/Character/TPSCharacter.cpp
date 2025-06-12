@@ -561,13 +561,20 @@ void ATPSCharacter::Die(bool bIsDeadParam)
 
 float ATPSCharacter::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser)
 {
-	float ActualDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
-	if (bIsAlive)
-	{
-		CharHealthComponent->ChangeHealthValue(-DamageAmount);
-	}
+	
+		if (!bIsDead == true)
+		{
 
-	return ActualDamage;
+			float ActualDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+			if (bIsAlive)
+			{
+				CharHealthComponent->ChangeHealthValue(-DamageAmount);
+			}
+
+			return ActualDamage;
+		}
+		return 0.0f;
+	
 }
 
 
