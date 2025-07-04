@@ -65,7 +65,7 @@ void AProjectileDefault_Grenade::Explose()
 		ProjectileSetting.ProjectileMinRadiusDamage,
 		ProjectileSetting.ProjectileMaxRadiusDamage,
 		5,
-		NULL, IgnoredActor, nullptr, nullptr);
+		NULL, IgnoredActor, this, nullptr);
 
 	this->Destroy();
 }

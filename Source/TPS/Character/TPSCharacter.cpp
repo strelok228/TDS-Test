@@ -14,6 +14,7 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Engine/World.h"
 #include "TPSGameInstance.h"
+#include "ProjectileDefault.h"
 
 ATPSCharacter::ATPSCharacter()
 {
@@ -122,6 +123,8 @@ void ATPSCharacter::SetupPlayerInputComponent(UInputComponent* NewInputComponent
 
 	NewInputComponent->BindAction(TEXT("SwitchNextWeapon"), EInputEvent::IE_Pressed, this, &ATPSCharacter::TrySwicthNextWeapon);
 	NewInputComponent->BindAction(TEXT("SwitchPreviosWeapon"), EInputEvent::IE_Pressed, this, &ATPSCharacter::TrySwitchPreviosWeapon);
+
+	NewInputComponent->BindAction(TEXT("AblityAction"), EInputEvent::IE_Pressed, this, &ATPSCharacter::TryAbilityEnabled);
 
 }
 
@@ -509,6 +512,54 @@ void ATPSCharacter::HandleCharacterMovementSpeedTick()
 
 }
 
+void ATPSCharacter::TryAbilityEnabled()
+{
+	if (AbilityEffect)//TODO Cool down
+	{
+		UTPS_StateEffect* NewEffect = NewObject<UTPS_StateEffect>(this, AbilityEffect);
+		if (NewEffect)
+		{
+			NewEffect->InitObject(this);
+		}
+	}
+}
+
+
+EPhysicalSurface ATPSCharacter::GetSurfuceType()
+{
+	EPhysicalSurface Result = EPhysicalSurface::SurfaceType_Default;
+	if (CharHealthComponent)
+	{
+		if (CharHealthComponent->GetCurrentShield() <= 0)
+		{
+			if (GetMesh())
+			{
+				UMaterialInterface* myMaterial = GetMesh()->GetMaterial(0);
+				if (myMaterial)
+				{
+					Result = myMaterial->GetPhysicalMaterial()->SurfaceType;
+				}
+			}
+		}
+	}
+	return Result;
+}
+
+TArray<UTPS_StateEffect*> ATPSCharacter::GetAllCurrentEffects()
+{
+	return Effects;
+}
+
+void ATPSCharacter::RemoveEffect(UTPS_StateEffect* RemoveEffect)
+{
+	Effects.Remove(RemoveEffect);
+}
+
+void ATPSCharacter::AddEffect(UTPS_StateEffect* newEffect)
+{
+	Effects.Add(newEffect);
+}
+
 void ATPSCharacter::CharDead()
 {
 	float TimeAnim = 0.0f;
@@ -559,6 +610,7 @@ void ATPSCharacter::Die(bool bIsDeadParam)
 
 }
 
+
 float ATPSCharacter::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser)
 {
 	
@@ -569,6 +621,15 @@ float ATPSCharacter::TakeDamage(float DamageAmount, struct FDamageEvent const& D
 			if (bIsAlive)
 			{
 				CharHealthComponent->ChangeHealthValue(-DamageAmount);
+			}
+
+			if (DamageEvent.IsOfType(FRadialDamageEvent::ClassID))
+			{
+				AProjectileDefault* myProjectile = Cast<AProjectileDefault>(DamageCauser);
+				if (myProjectile)
+				{
+					UTupes::AddEffectBySurfaceType(this, myProjectile->ProjectileSetting.Effect, GetSurfuceType());
+				}
 			}
 
 			return ActualDamage;

@@ -177,10 +177,17 @@ FProjectileInfo AWeaponDefault::GetProjectile()
 void AWeaponDefault::Fire()
 {
 	UAnimMontage* AnimToPlay = nullptr;
+	if (WeaponAiming)
+		AnimToPlay = WeaponSetting.AnimWeaponInfo.AnimCharFireAim;
+	else
+		AnimToPlay = WeaponSetting.AnimWeaponInfo.AnimCharFire;
 
-	FireTimer = WeaponSetting.RateOfFire;
-	AdditionalWeaponInfo.Round = AdditionalWeaponInfo.Round - 1;
-	ChangeDispersionByShot();
+	if (WeaponSetting.AnimWeaponInfo.AnimWeaponFire
+		&& SkeletalMeshWeapon
+		&& SkeletalMeshWeapon->GetAnimInstance())//Bad Code? maybe best way init local variable or in func
+	{
+		SkeletalMeshWeapon->GetAnimInstance()->Montage_Play(WeaponSetting.AnimWeaponInfo.AnimWeaponFire);
+	}
 
 	if (WeaponSetting.ShellBullets.DropMesh)
 	{
@@ -195,11 +202,12 @@ void AWeaponDefault::Fire()
 		}
 	}
 
-	OnWeaponFireStart.Broadcast(AnimToPlay);
 
 	FireTimer = WeaponSetting.RateOfFire;
 	AdditionalWeaponInfo.Round = AdditionalWeaponInfo.Round - 1;
 	ChangeDispersionByShot();
+
+	OnWeaponFireStart.Broadcast(AnimToPlay);
 
 	UGameplayStatics::SpawnSoundAtLocation(GetWorld(), WeaponSetting.SoundFireWeapon, ShootLocation->GetComponentLocation());
 	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), WeaponSetting.EffectFireWeapon, ShootLocation->GetComponentTransform());
@@ -218,16 +226,17 @@ void AWeaponDefault::Fire()
 		{
 			EndLocation = GetFireEndLocation();
 
-			FVector Dir = EndLocation - SpawnLocation;
-
-			Dir.Normalize();
-
-			FMatrix myMatrix(Dir, FVector(0, 1, 0), FVector(0, 0, 1), FVector::ZeroVector);
-			SpawnRotation = myMatrix.Rotator();
-
 			if (ProjectileInfo.Projectile)
 			{
 				//Projectile Init ballistic fire
+				FVector Dir = EndLocation - SpawnLocation;
+
+				Dir.Normalize();
+
+				FMatrix myMatrix(Dir, FVector(0, 1, 0), FVector(0, 0, 1), FVector::ZeroVector);
+				SpawnRotation = myMatrix.Rotator();
+
+
 
 				FActorSpawnParameters SpawnParams;
 				SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
@@ -242,9 +251,61 @@ void AWeaponDefault::Fire()
 			}
 			else
 			{
-				//ToDo Projectile null Init trace fire			
+				FHitResult Hit;
+				TArray<AActor*> Actors;
 
-				//GetWorld()->LineTraceSingleByChannel()
+				EDrawDebugTrace::Type DebugTrace;
+				if (ShowDebug)
+				{
+					DrawDebugLine(GetWorld(), SpawnLocation, SpawnLocation + ShootLocation->GetForwardVector() * WeaponSetting.DistacneTrace, FColor::Black, false, 5.f, (uint8)'\000', 0.5f);
+					DebugTrace = EDrawDebugTrace::ForDuration;
+				}
+				else
+					DebugTrace = EDrawDebugTrace::None;
+
+				UKismetSystemLibrary::LineTraceSingle(GetWorld(), SpawnLocation, EndLocation * WeaponSetting.DistacneTrace,
+					ETraceTypeQuery::TraceTypeQuery4, false, Actors, DebugTrace, Hit, true, FLinearColor::Red, FLinearColor::Green, 5.0f);
+
+				if (Hit.GetActor() && Hit.PhysMaterial.IsValid())
+				{
+					EPhysicalSurface mySurfacetype = UGameplayStatics::GetSurfaceType(Hit);
+
+					if (WeaponSetting.ProjectileSetting.HitDecals.Contains(mySurfacetype))
+					{
+						UMaterialInterface* myMaterial = WeaponSetting.ProjectileSetting.HitDecals[mySurfacetype];
+
+						if (myMaterial && Hit.GetComponent())
+						{
+							UGameplayStatics::SpawnDecalAttached(myMaterial, FVector(20.0f), Hit.GetComponent(), NAME_None, Hit.ImpactPoint, Hit.ImpactNormal.Rotation(), EAttachLocation::KeepWorldPosition, 10.0f);
+						}
+					}
+					if (WeaponSetting.ProjectileSetting.HitFXs.Contains(mySurfacetype))
+					{
+						UParticleSystem* myParticle = WeaponSetting.ProjectileSetting.HitFXs[mySurfacetype];
+						if (myParticle)
+						{
+							UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), myParticle, FTransform(Hit.ImpactNormal.Rotation(), Hit.ImpactPoint, FVector(1.0f)));
+						}
+					}
+
+					if (WeaponSetting.ProjectileSetting.HitSound)
+					{
+						UGameplayStatics::PlaySoundAtLocation(GetWorld(), WeaponSetting.ProjectileSetting.HitSound, Hit.ImpactPoint);
+					}
+
+
+					UTupes::AddEffectBySurfaceType(Hit.GetActor(), ProjectileInfo.Effect, mySurfacetype);
+
+					//if (Hit.GetActor()->GetClass()->ImplementsInterface(UTPS_IGameActor::StaticClass()))
+					//{
+					//	//ITPS_IGameActor::Execute_AviableForEffects(Hit.GetActor());
+					//	//ITPS_IGameActor::Execute_AviableForEffectsBP(Hit.GetActor());
+					//}
+
+					UGameplayStatics::ApplyPointDamage(Hit.GetActor(), WeaponSetting.ProjectileSetting.ProjectileDamage, Hit.TraceStart, Hit, GetInstigatorController(), this, NULL);
+					//UGameplayStatics::ApplyDamage(Hit.GetActor(), WeaponSetting.ProjectileSetting.ProjectileDamage, GetInstigatorController(), this, NULL);
+				}
+
 			}
 		}
 	}

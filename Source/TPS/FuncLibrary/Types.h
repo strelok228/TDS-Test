@@ -4,8 +4,12 @@
 
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "Engine/DataTable.h"
+#include "TPS_StateEffect.h"
 
 #include "Types.generated.h"
+
+
+class UTPS_IGameActor;
 
 UENUM(BlueprintType)
 enum class EMovementState : uint8
@@ -78,6 +82,9 @@ struct FProjectileInfo
 	//fx when hit check by surface
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FX")
 		TMap<TEnumAsByte<EPhysicalSurface>, UParticleSystem*> HitFXs;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effect")
+		TSubclassOf<UTPS_StateEffect> Effect = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Explode")
 		UParticleSystem* ExploseFX = nullptr;
@@ -290,5 +297,9 @@ class TPS_API UTupes : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
 
+public:
+
+	UFUNCTION(BlueprintCallable)
+	static void AddEffectBySurfaceType(AActor* TakeEffectActor, TSubclassOf<UTPS_StateEffect> AddEffectClass, EPhysicalSurface SurfaceType);
 };
 

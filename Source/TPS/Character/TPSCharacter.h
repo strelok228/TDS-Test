@@ -9,11 +9,12 @@
 #include "Character/TPSInventoryComponent.h"
 #include "Character/TPSCharacterHealthComponent.h"
 #include "TPSHealthComponent.h"
+#include "Interface/TPS_IGameActor.h"
 
 #include "TPSCharacter.generated.h"
 
 UCLASS(Blueprintable)
-class ATPSCharacter : public ACharacter
+class ATPSCharacter : public ACharacter, public ITPS_IGameActor
 {
     GENERATED_BODY()
 
@@ -90,10 +91,16 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
     TArray<UAnimMontage*> DeadsAnim;
 
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ability")
+    TSubclassOf<UTPS_StateEffect> AbilityEffect;
+
     // Weapon
     AWeaponDefault* CurrentWeapon = nullptr;
 
     UDecalComponent* CurrentCursor = nullptr;
+
+    //Effect
+    TArray<UTPS_StateEffect*> Effects;
 
     float AxisX = 0.0f;
     float AxisY = 0.0f;
@@ -157,7 +164,7 @@ public:
 
     UFUNCTION(BlueprintCallable)
     UDecalComponent* GetCursorToWorld();
-
+    
     void TrySwicthNextWeapon();
     void TrySwitchPreviosWeapon();
 
@@ -167,7 +174,19 @@ public:
     UFUNCTION()
     void Die(bool bIsDeadParam);
 
-    //
+    //ability func
+    void TryAbilityEnabled();
+
+
+    //Intarface
+
+    EPhysicalSurface GetSurfuceType() override;
+    TArray<UTPS_StateEffect*> GetAllCurrentEffects() override;
+    void RemoveEffect(UTPS_StateEffect* RemoveEffect)override;
+    void AddEffect(UTPS_StateEffect* newEffect)override;
+
+    //End Interface
+
     UFUNCTION(BlueprintCallable)
     void CharDead();
     void EnableRagdoll();
