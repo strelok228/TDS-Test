@@ -21,8 +21,8 @@ public:
 
 	UPROPERTY(BlueprintAssignable, EditAnywhere, BlueprintReadWrite, Category = "Health")
 	FOnHealthChange OnHealthChange;
-	UPROPERTY(BlueprintAssignable, EditAnywhere, BlueprintReadWrite, Category = "Health")
-	FOnDead OnDead;
+	//UPROPERTY(BlueprintAssignable, EditAnywhere, BlueprintReadWrite, Category = "Health")
+	//FOnDead OnDead;
 	UPROPERTY(BlueprintAssignable, EditAnywhere, BlueprintReadWrite, Category = "Health")
 	FOnDead OnDead2;
 
