@@ -103,6 +103,10 @@ void ATPSCharacter::BeginPlay()
 	{
 		CurrentCursor = UGameplayStatics::SpawnDecalAtLocation(GetWorld(), CursorMaterial, CursorSize, FVector(0));
 	}
+	if (USkeletalMeshComponent* MeshComp = GetMesh())
+	{
+		AnimInstance = MeshComp->GetAnimInstance();
+	}
 }
 
 void ATPSCharacter::SetupPlayerInputComponent(UInputComponent* NewInputComponent)
@@ -127,6 +131,7 @@ void ATPSCharacter::SetupPlayerInputComponent(UInputComponent* NewInputComponent
 	NewInputComponent->BindAction(TEXT("AblityAction"), EInputEvent::IE_Pressed, this, &ATPSCharacter::TryAbilityEnabled);
 
 }
+
 
 void ATPSCharacter::InputAxisY(float Value)
 {
@@ -637,5 +642,3 @@ float ATPSCharacter::TakeDamage(float DamageAmount, struct FDamageEvent const& D
 		return 0.0f;
 	
 }
-
-

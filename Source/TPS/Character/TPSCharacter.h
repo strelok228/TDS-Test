@@ -51,6 +51,18 @@ public:
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Status")
     bool bIsDead;
 
+    UPROPERTY()
+    class UMaterialInstanceDynamic* MaterialInstance;
+
+    UPROPERTY(EditAnywhere, Category = "Effects")
+    UParticleSystem* DamageParticleEffect;
+
+    //UPROPERTY(EditAnywhere, Category = "Effects")
+    //UNiagaraSystem* DamageNiagaraEffect;
+
+    UPROPERTY()
+    UAnimInstance* AnimInstance;
+
 
 private:
     /** Top down camera */
@@ -191,6 +203,5 @@ public:
     void CharDead();
     void EnableRagdoll();
     virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;;
-
 
 };
