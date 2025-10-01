@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "UObject/Interface.h"
 #include "TPS_StateEffect.h"
+#include "FuncLibrary/Types.h"
 #include "TPS_IGameActor.generated.h"
 
 // This class does not need to be modified.
@@ -29,4 +30,10 @@ public:
 	virtual TArray<UTPS_StateEffect*> GetAllCurrentEffects();
 	virtual void RemoveEffect(UTPS_StateEffect* RemoveEffect);
 	virtual void AddEffect(UTPS_StateEffect* newEffect);
+	
+	//inf
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	void DropWeaponToWorld(FDropItem DropItemInfo);
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	void DropAmmoToWorld(EWeaponType TypeAmmo, int32 Cout);
 };
