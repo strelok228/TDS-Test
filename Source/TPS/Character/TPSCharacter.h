@@ -54,12 +54,6 @@ protected:
     float AxisX = 0.0f;
     float AxisY = 0.0f;
 
-    bool SprintRunEnabled = false;
-    bool WalkEnabled = false;
-    bool AimEnabled = false;
-
-    bool bIsAlive = true;
-
     EMovementState MovementState = EMovementState::Run_State;
 
     AWeaponDefault* CurrentWeapon = nullptr;
@@ -67,8 +61,6 @@ protected:
     UDecalComponent* CurrentCursor = nullptr;
 
     TArray<UTPS_StateEffect*> Effects;
-
-    int32 CurrentIndexWeapon = 0;
 
     UFUNCTION()
     void CharDead();
@@ -199,7 +191,17 @@ public:
     UFUNCTION()
     void Die(bool bIsDeadParam);
 
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
+    bool SprintRunEnabled = false;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
+    bool WalkEnabled = false;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
+    bool AimEnabled = false;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
+    bool bIsAlive = true;
 
+    UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+    int32 CurrentIndexWeapon = 0;
 
     //Intarface
 
