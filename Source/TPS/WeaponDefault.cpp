@@ -53,16 +53,16 @@ void AWeaponDefault::Tick(float DeltaTime)
 
 void AWeaponDefault::FireTick(float DeltaTime)
 {
-	if (GetWeaponRound() > 0)
+	if (WeaponFiring && GetWeaponRound() > 0 && !WeaponReloading)
 	{
-		if (WeaponFiring)
-			if (FireTimer < 0.f)
-			{
-				if (!WeaponReloading)
-					Fire();
-			}
-			else
-				FireTimer -= DeltaTime;
+		
+		if (FireTimer < 0.f)
+		{
+			if (!WeaponReloading)
+				Fire();
+		}
+		else
+			FireTimer -= DeltaTime;
 	}
 }
 
@@ -184,7 +184,7 @@ void AWeaponDefault::Fire()
 
 	if (WeaponSetting.AnimWeaponInfo.AnimWeaponFire
 		&& SkeletalMeshWeapon
-		&& SkeletalMeshWeapon->GetAnimInstance())//Bad Code? maybe best way init local variable or in func
+		&& SkeletalMeshWeapon->GetAnimInstance())
 	{
 		SkeletalMeshWeapon->GetAnimInstance()->Montage_Play(WeaponSetting.AnimWeaponInfo.AnimWeaponFire);
 	}
@@ -293,17 +293,10 @@ void AWeaponDefault::Fire()
 						UGameplayStatics::PlaySoundAtLocation(GetWorld(), WeaponSetting.ProjectileSetting.HitSound, Hit.ImpactPoint);
 					}
 
-
 					UTupes::AddEffectBySurfaceType(Hit.GetActor(), ProjectileInfo.Effect, mySurfacetype);
 
-					//if (Hit.GetActor()->GetClass()->ImplementsInterface(UTPS_IGameActor::StaticClass()))
-					//{
-					//	//ITPS_IGameActor::Execute_AviableForEffects(Hit.GetActor());
-					//	//ITPS_IGameActor::Execute_AviableForEffectsBP(Hit.GetActor());
-					//}
-
 					UGameplayStatics::ApplyPointDamage(Hit.GetActor(), WeaponSetting.ProjectileSetting.ProjectileDamage, Hit.TraceStart, Hit, GetInstigatorController(), this, NULL);
-					//UGameplayStatics::ApplyDamage(Hit.GetActor(), WeaponSetting.ProjectileSetting.ProjectileDamage, GetInstigatorController(), this, NULL);
+				
 				}
 
 			}
@@ -312,7 +305,6 @@ void AWeaponDefault::Fire()
 
 	if (GetWeaponRound() <= 0 && !WeaponReloading)
 	{
-		//Init Reload
 		if (CheckCanWeaponReload())
 			InitReload();
 	}
@@ -479,7 +471,7 @@ void AWeaponDefault::FinishReload()
 
 	if (NeedToReload > AviableAmmoFromInventory)
 	{
-		AdditionalWeaponInfo.Round = AviableAmmoFromInventory;
+		AdditionalWeaponInfo.Round += AviableAmmoFromInventory;
 		AmmoNeedTakeFromInv = AviableAmmoFromInventory;
 	}
 	else
@@ -538,20 +530,6 @@ int8 AWeaponDefault::GetAviableAmmoForReload()
 }
 void AWeaponDefault::InitDropMesh(UStaticMesh* DropMesh, FTransform Offset, FVector DropImpulseDirection, float LifeTimeMesh, float ImpulseRandomDispersion, float PowerImpulse, float CustomMass)
 {
-
-	//CreateDefaultSubobject() Not use
-
-	//Not actor for abstract object
-	//if (WeaponSetting.MagazineDrop)
-	//{
-	//	UStaticMeshComponent* newStaticMesh = NewObject<UStaticMeshComponent>(this, FName("DropClipStaticMesh"));
-	//	if (newStaticMesh)
-	//	{
-	//		newStaticMesh->SetStaticMesh(WeaponSetting.MagazineDrop);		
-	//		//...
-	//	}
-	//}
-
 	if (DropMesh)
 	{
 		FTransform Transform;

@@ -22,9 +22,9 @@ class TPS_API UTPSInventoryComponent : public UActorComponent
 	GENERATED_BODY()
 
 public:	
-	// Sets default values for this component's properties
 	UTPSInventoryComponent();
 
+	UPROPERTY(BlueprintAssignable, Category = "Inventory")
 	FOnSwitchWeapon OnSwitchWeapon;
 	UPROPERTY(BlueprintAssignable, EditAnywhere, BlueprintReadWrite, Category = "Inventory")
 	FOnAmmoChange OnAmmoChange;

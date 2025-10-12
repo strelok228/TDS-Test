@@ -161,9 +161,14 @@ public:
     UFUNCTION()
     void InitWeapon(FName IdWeaponName, FAdditionalWeaponInfo WeaponAdditionalInfo, int32 NewCurrentIndexWeapon);
     void TryReloadWeapon();
+    
+    UFUNCTION()
     void WeaponFireStart(UAnimMontage* Anim);
+
+    UFUNCTION()
     void WeaponReloadStart(UAnimMontage* Anim);
-    void WeaponReloadEnd(bool bIsSuccess, int32 AmmoSafe);
+    UFUNCTION()
+    void WeaponReloadEnd(bool bIsSuccess, int32 AmmoTake);
 
     bool TrySwitchWeaponToIndexByKeyInput(int32 ToIndex);
     void DropCurrentWeapon();
